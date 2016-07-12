@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/views/manage/role/create.blade.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/views/manage/role/edit.blade.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/lang/vi/auth.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Http/Controllers/Admin/RoleController.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/lang/vi/manage.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/views/manage/role/index.blade.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Http/routes.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Eloquents/RoleEloquent.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Eloquents/BaseEloquent.php</file>
+        </group>
+    </open-files>
+</project-private>
