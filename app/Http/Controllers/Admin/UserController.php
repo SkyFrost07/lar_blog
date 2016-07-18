@@ -22,6 +22,8 @@ class UserController extends Controller
     }
     
     public function index(Request $request){
+        canAccess('read_users');
+        
         $users = $this->user->all($request->all());
         return view('manage.user.index', ['items' => $users]);
     }
@@ -30,7 +32,6 @@ class UserController extends Controller
         canAccess('publish_users');
         
         $roles = $this->role->all(['orderby' => 'id', 'order' => 'asc'])->lists('label', 'id'); 
-        $roles->prepend(trans('manage.selection'), 0);
         return view('manage.user.create', ['roles' => $roles]);
     }
     
@@ -50,11 +51,11 @@ class UserController extends Controller
         
         $item = $this->user->find($id);
         $roles = $this->role->all(['orderby' => 'id', 'order' => 'asc'])->lists('label', 'id');
-        $roles->prepend(trans('manage.selection'), 0);
         return view('manage.user.edit', ['item' => $item, 'roles' => $roles]);
     }
     
     public function update($id, Request $request){
+        canAccess('edit_my_user', $id);
         try{
             $this->user->update($id, $request->all());
             return redirect()->back()->with('succ_mess', trans('manage.update_success'));
@@ -64,6 +65,8 @@ class UserController extends Controller
     }
     
     public function destroy($id){
+        canAccess('remove_my_user', $id);
+        
         if(!$this->user->destroy($id)){
             return redirect()->back()->with('error_mess', trans('manage.no_item'));
         }
@@ -71,6 +74,6 @@ class UserController extends Controller
     }
     
     public function multiAction(Request $request){
-        return $result = $this->user->actions($request);
+        return response()->json($result = $this->user->actions($request));
     }
 }

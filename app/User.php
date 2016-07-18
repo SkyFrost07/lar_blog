@@ -38,11 +38,11 @@ class User extends Authenticatable
     
     public function status(){
         switch ($this->status){
-            case 0:
+            case -1:
                 return 'Disabled';
-            case 1:
+            case 0:
                 return 'Baned';
-            case 2:
+            case 1:
                 return 'Active';
             default:
                 return 'Disabled';

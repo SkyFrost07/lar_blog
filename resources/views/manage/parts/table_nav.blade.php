@@ -11,7 +11,7 @@
     </div>
 
     <div class="collapse navbar-collapse" id="bs_table">
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav nav-status">
             @yield('options')
         </ul>
         @yield('actions')

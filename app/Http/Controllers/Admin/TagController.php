@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Controller;
+use App\Eloquents\TagEloquent;
+
+class TagController extends Controller
+{
+    protected $tag;
+
+    public function __construct(TagEloquent $tag) {
+        canAccess('manage_tags');
+
+        $this->tag = $tag;
+    }
+
+    public function index(Request $request) {
+        $data = $request->all();
+        $tags = $this->tag->all($data);
+        return view('manage.tag.index', ['items' => $tags]);
+    }
+
+    public function create() {
+        return view('manage.tag.create');
+    }
+
+    public function store(Request $request) {
+        try {
+            $this->tag->insert($request->all());
+            return redirect()->back()->with('succ_mess', trans('manage.store_success'));
+        } catch (ValidationException $ex) {
+            return redirect()->back()->withInput()->withErrors($ex->validator);
+        } catch (DbException $ex) {
+            return redirect()->back()->withInput()->with('error_mess', $ex->getMess());
+        }
+    }
+
+    public function edit($id) {
+        $item = $this->tag->find($id);
+        return view('manage.tag.edit', ['item' => $item]);
+    }
+
+    public function update($id, Request $request) {
+        try {
+            $this->tag->update($id, $request->all());
+            return redirect()->back()->with('succ_mess', trans('manage.update_success'));
+        } catch (ValidationException $ex) {
+            return redirect()->back()->withInput()->withErrors($ex->validator);
+        }
+    }
+
+    public function destroy($id) {
+        if (!$this->tag->destroy($id)) {
+            return redirect()->back()->with('error_mess', trans('manage.no_item'));
+        }
+        return redirect()->back()->with('succ_mess', trans('manage.destroy_success'));
+    }
+
+    public function multiAction(Request $request) {
+        return response()->json($result = $this->tag->actions($request));
+    }
+}

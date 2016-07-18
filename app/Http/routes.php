@@ -1,8 +1,7 @@
 <?php
 
-$locale = app()->getLocale();
+Route::get('switch-languages/{code}', ['as' => 'switch_lang', 'uses' => 'HomeController@switchLang']);
 
-//Route::group(['prefix' => $locale], function() {
 Route::group(['namespace' => 'Auth'], function() {
     Route::group(['middleware' => 'throw'], function() {
 //    Register
@@ -23,19 +22,28 @@ Route::group(['namespace' => 'Auth'], function() {
 
 Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
 
-$manage = env('MAN_PREFIX');
+$manage = config('app.manage_prefix', 'manage');
 //
 Route::group(['prefix' => $manage, 'middleware' => 'auth', 'namespace' => 'Admin'], function() {
     Route::get('/', ['as' => 'dashboard', 'uses' => 'AdminController@index']);
 //    Roles
-    Route::resource('role', 'RoleController', rsNames('role'));
     Route::post('/role/multi-actions', ['as' => 'role.m_action', 'uses' => 'RoleController@multiAction']);
+    Route::resource('role', 'RoleController', rsNames('role'));
 //    Caps
+    Route::post('/cap/multi-actions', ['as' => 'cap.m_action', 'uses' => 'CapController@multiAction']);
     Route::resource('cap', 'CapController', rsNames('cap'));
-    Route::post('/cap/multi-actions', ['as' => 'cap.m_action', 'uses' => 'RoleController@multiAction']);
 //    Users
-    Route::resource('user', 'UserController', rsNames('user'));
     Route::post('/user/multi-actions', ['as' => 'user.m_action', 'uses' => 'UserController@multiAction']);
+    Route::resource('user', 'UserController', rsNames('user'));
+//    Languages
+    Route::resource('lang', 'LangController', rsNames('lang'));
+    Route::post('/lang/multi-actions', ['as' => 'lang.m_action', 'uses' => 'LangController@multiAction']);
+//    Categories
+    Route::resource('cat', 'CatController', rsNames('cat'));
+    Route::post('/cat/multi-actions', ['as' => 'cat.m_action', 'uses' => 'CatController@multiAction']);
+//    Tags
+    Route::resource('tag', 'TagController', rsNames('tag'));
+    Route::post('/tag/multi-actions', ['as' => 'tag.m_action', 'uses' => 'TagController@multiAction']);
 });
 
 //});

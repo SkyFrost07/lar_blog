@@ -39,10 +39,10 @@
         
         <div class="form-group">
             <label>{{trans('manage.status')}}</label>
-            {!! Form::select('status', [0 => 'Disabled', 1=>'Banned', 2 => 'Active'], $item->status, ['class' => 'form-control']) !!}
+            {!! Form::select('status', [-1 => 'Disabled', 0=>'Banned', 1 => 'Active'], $item->status, ['class' => 'form-control']) !!}
         </div>
         
-        <a href="{{route('user.index')}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
+        <a href="{{route('user.index', ['status' => 1])}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{trans('manage.update')}}</button>
         
         {!! Form::close() !!}

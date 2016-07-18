@@ -35,17 +35,6 @@ class RoleEloquent extends BaseEloquent{
         return $this->model->search($opts['key'])->orderby($opts['orderby'], $opts['order'])->paginate($opts['per_page']);
     }
     
-    public function insert($data){
-        if($this->validator($data, $this->rules())){
-            $item = new $this->model();
-            $item->label = $data['label'];
-            $item->name = $data['name'];
-            return $item->save();
-        }else{
-            throw new ValidationException($this->getError());
-        }
-    }
-    
     public function getDefaultId(){
         $item = $this->model->where('default', 1)->select('id')->first();
         if($item){

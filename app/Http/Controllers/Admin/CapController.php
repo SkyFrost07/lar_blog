@@ -14,6 +14,8 @@ class CapController extends Controller
     protected $cap;
     
     public function __construct(CapEloquent $cap) {
+        canAccess('manage_caps');
+        
         $this->cap = $cap;
     }
     
@@ -39,7 +41,7 @@ class CapController extends Controller
     
     public function edit($id){
         $item = $this->cap->find($id);
-        $highers = $this->cap->all(['orderby' => 'name', 'exclude' => [$id]])->lists('name', 'name');
+        $highers = $this->cap->all(['orderby' => 'name', 'exclude' => [$id], 'per_page' => -1])->lists('name', 'name');
         $highers->prepend(trans('manage.selection'), '');
         return view('manage.cap.edit', ['item' => $item, 'highers' => $highers]);
     }
@@ -61,6 +63,6 @@ class CapController extends Controller
     }
     
     public function multiAction(Request $request){
-        return $result = $this->cap->actions($request);
+        return response()->json($result = $this->cap->actions($request));
     }
 }

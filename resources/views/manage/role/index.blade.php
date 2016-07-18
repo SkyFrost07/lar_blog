@@ -5,12 +5,12 @@
 @section('page_title', trans('manage.man_roles'))
 
 @section('options')
-<li><a href="#">{{trans('manage.all')}}</a></li>
+<li class="{{isActive('role.index')}}"><a href="{{route('role.index')}}">{{trans('manage.all')}}</a></li>
 @stop
 
 @section('actions')
 <a href="{{route('role.create')}}" class="btn btn-sm btn-success navbar-btn"><i class="fa fa-plus"></i> {{trans('manage.create')}}</a>
-{!! Form::open(['method' => 'post', 'route' => 'role.m_action', 'class' => 'form-inline remove-form', 'title' => trans('manage.remove')]) !!}
+{!! Form::open(['method' => 'post', 'route' => 'role.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.remove')]) !!}
 {!! Form::hidden('action', 'remove') !!}
 <div class="hidden select_items"></div>
 <button type="submit" class="btn btn-sm btn-danger navbar-btn"><i class="fa fa-remove"></i> {{trans('manage.remove')}}</button>

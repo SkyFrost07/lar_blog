@@ -5,16 +5,19 @@
 @section('page_title', trans('manage.man_caps'))
 
 @section('options')
-<li><a href="#">{{trans('manage.all')}}</a></li>
+<li class="{{isActive('cap.index')}}"><a href="{{route('cap.index')}}">{{trans('manage.all')}}</a></li>
 @stop
 
 @section('actions')
+
+@if(cando('manage_caps'))
 <a href="{{route('cap.create')}}" class="btn btn-sm btn-success navbar-btn"><i class="fa fa-plus"></i> {{trans('manage.create')}}</a>
-{!! Form::open(['method' => 'post', 'route' => 'cap.m_action', 'class' => 'form-inline remove-form', 'title' => trans('manage.remove')]) !!}
+{!! Form::open(['method' => 'post', 'route' => 'cap.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.remove')]) !!}
 {!! Form::hidden('action', 'remove') !!}
-<div class="hidden select_items"></div>
 <button type="submit" class="btn btn-sm btn-danger navbar-btn"><i class="fa fa-remove"></i> {{trans('manage.remove')}}</button>
 {!! Form::close() !!}
+@endif
+
 @stop
 
 @section('table_nav')
@@ -57,6 +60,11 @@
         </tbody>
     </table>
 </div>
+
+<div class="paginate">
+    {!! $items->render() !!}
+</div>
+
 @else
 <p>{{trans('manage.no_item')}}</p>
 @endif

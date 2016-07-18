@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
 //        Facades
+//        Permission
         $this->app->bind('access', 'App\Facades\Access\Access');
+//        Languages
+        $this->app->bind('languages', 'App\Facades\Lang\Lang');
+        
     }
 }

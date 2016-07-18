@@ -22,7 +22,7 @@ class CapEloquent extends BaseEloquent{
     
     public function all($args=[]){
         $opts = [
-            'field' => ['*'],
+            'fields' => ['*'],
             'orderby' => 'name',
             'order' => 'asc',
             'per_page' => 20,
@@ -33,36 +33,23 @@ class CapEloquent extends BaseEloquent{
         
         $opts = array_merge($opts, $args);
         
-        return $this->model->whereNotIn('id', $opts['exclude'])->search($opts['key'])->orderby($opts['orderby'], $opts['order'])->paginate($opts['per_page']);
+        $result = $this->model
+                ->whereNotIn('id', $opts['exclude'])
+                ->search($opts['key'])
+                ->orderby($opts['orderby'], $opts['order'])
+                ->select($opts['fields']);
+        
+        if($opts['per_page'] == -1){
+            $result = $result->get();
+        }else{
+            $result = $result->paginate($opts['per_page']);
+        }
+        return $result;
     }
     
     function findByName($name, $fields=['*']){
         return $this->model->where('name', $name)->select($fields)->first();
     }
     
-    public function insert($data){
-        if($this->validator($data, $this->rules())){
-            $item = new $this->model();
-            return $item->create($data);
-        }else{
-            throw new ValidationException($this->getError());
-        }
-    }
-    
-    public function update($id, $data){
-        if($this->validator($data, $this->rules($id))){
-            $item = $this->model->find($id);
-            if(isset($data['label'])){
-                $item->label = $data['label'];
-            }
-            $item->name = $data['name'];
-            if(isset($data['higher'])){
-                $item->higher = $data['higher'];
-            }
-            return $item->save();
-        }else{
-            throw new ValidationException($this->getError());
-        }
-    }
 }
 

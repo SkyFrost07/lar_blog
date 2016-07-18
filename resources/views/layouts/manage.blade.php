@@ -38,6 +38,10 @@ and open the template in the editor.
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-menu">
                         <ul class="nav navbar-nav navbar-right">
+                            @foreach(get_langs() as $lang)
+                            <li><a href="{{$lang->switch_url()}}">{!! $lang->icon() !!} {{$lang->name}}</a></li>
+                            @endforeach
+                            
                             @if(auth()->check())
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell-o"></i> <i class="fa fa-caret-down"></i></a>

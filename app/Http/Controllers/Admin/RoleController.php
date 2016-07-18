@@ -15,6 +15,8 @@ class RoleController extends Controller
     protected $cap;
     
     public function __construct(RoleEloquent $role, CapEloquent $cap) {
+        canAccess('manage_caps');
+        
         $this->role = $role;
         $this->cap = $cap;
     }

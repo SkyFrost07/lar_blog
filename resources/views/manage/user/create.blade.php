@@ -46,7 +46,7 @@
             {!! Form::select('status', [2 => 'Active', 0 => 'Disabled', 1=>'Banned'], old('status'), ['class' => 'form-control']) !!}
         </div>
         
-        <a href="{{route('user.index')}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
+        <a href="{{route('user.index', ['status' => 1])}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{trans('manage.create')}}</button>
         
         {!! Form::close() !!}

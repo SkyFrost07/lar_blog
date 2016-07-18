@@ -14,7 +14,12 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
-
+    
+    /*
+     * My custom
+     */
+    'manage_prefix' => 'manage',
+    
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
@@ -211,7 +216,8 @@ return [
          * My custom
          */
         'Form' => Collective\Html\FormFacade::class,
-        'Access' => App\Facades\Access\AccessFacade::class
+        'Access' => App\Facades\Access\AccessFacade::class,
+        'Lang' => App\Facades\Lang\LangFacade::class,
 
     ],
 

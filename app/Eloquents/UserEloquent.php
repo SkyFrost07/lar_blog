@@ -4,7 +4,6 @@ namespace App\Eloquents;
 
 use App\Eloquents\BaseEloquent;
 use App\Eloquents\RoleEloquent;
-
 use Illuminate\Validation\ValidationException;
 
 class UserEloquent extends BaseEloquent {
@@ -33,6 +32,7 @@ class UserEloquent extends BaseEloquent {
 
     public function all($args = []) {
         $opts = [
+            'status' => 1,
             'field' => ['*'],
             'orderby' => 'id',
             'order' => 'asc',
@@ -44,14 +44,14 @@ class UserEloquent extends BaseEloquent {
 
         $opts = array_merge($opts, $args);
 
-        return $this->model->whereNotIn('id', $opts['exclude'])->search($opts['key'])->orderby($opts['orderby'], $opts['order'])->paginate($opts['per_page']);
+        return $this->model->where('status', $opts['status'])->whereNotIn('id', $opts['exclude'])->search($opts['key'])->orderby($opts['orderby'], $opts['order'])->paginate($opts['per_page']);
     }
 
     public function insert($data) {
         if ($this->validator($data, $this->rules())) {
             $item = new $this->model();
             $data['password'] = bcrypt($data['password']);
-            if(!isset($data['role_id']) || $data['role_id'] != 0){
+            if (!isset($data['role_id']) || $data['role_id'] != 0) {
                 $data['role_id'] = $this->elRole->getDefaultId();
             }
             return $item->create($data);
@@ -59,28 +59,17 @@ class UserEloquent extends BaseEloquent {
             throw new ValidationException($this->getError());
         }
     }
-    
+
     public function update($id, $data) {
         if ($this->validator($data, $this->rules($id))) {
-            $item = $this->model->find($id);
-            if (isset($data['name'])) {
-                $item->name = $data['name'];
-            }
-            if (isset($data['email']) && $data['email']) {
-                $item->email = $data['email'];
-            }
-            if (isset($data['password']) && $data['password']) {
-                $item->password = bcrypt($data['password']);
-            }
-            if (isset($data['role_id']) && $data['role_id'] != 0) {
-                $item->role_id = $data['role_id'];
+            $fillable = $this->model->getFillable();
+            if(isset($data['password']) && ($data['password'])){
+                $data['password'] = bcrypt($data['password']);
             }else{
-                $item->role_id = $this->elRole->getDefaultId();
+                unset($data['password']);
             }
-            if (isset($data['status'])) {
-                $item->status = $data['status'];
-            }
-            return $item->save();
+            $data = array_only($data, $fillable);
+            return $this->model->where('id', $id)->update($data);
         } else {
             throw new ValidationException($this->getError());
         }

@@ -5,16 +5,39 @@
 @section('page_title', trans('manage.man_users'))
 
 @section('options')
-<li><a href="#">{{trans('manage.all')}}</a></li>
+<li class="{{isActive('user.index', 1)}}"><a href="{{route('user.index', ['status' => 1])}}">{{trans('manage.all')}}</a></li>
+<li class="{{isActive('user.index', 0)}}"><a href="{{route('user.index', ['status' => 0])}}">{{trans('manage.ban')}}</a></li>
+<li class="{{isActive('user.index', -1)}}"><a href="{{route('user.index', ['status' => -1])}}">{{trans('manage.disable')}}</a></li>
 @stop
 
 @section('actions')
+
+@if(cando('publish_users'))
 <a href="{{route('user.create')}}" class="btn btn-sm btn-success navbar-btn"><i class="fa fa-plus"></i> {{trans('manage.create')}}</a>
-{!! Form::open(['method' => 'post', 'route' => 'user.m_action', 'class' => 'form-inline remove-form', 'title' => trans('manage.remove')]) !!}
+@endif
+@if(cando('edit_other_users'))
+{!! Form::open(['method' => 'post', 'route' => 'user.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.restore')]) !!}
+{!! Form::hidden('action', 'restore') !!}
+<button type="submit" class="btn btn-sm btn-info navbar-btn"><i class="fa fa-mail-forward"></i> {{trans('manage.restore')}}</button>
+{!! Form::close() !!}
+
+{!! Form::open(['method' => 'post', 'route' => 'user.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.ban')]) !!}
+{!! Form::hidden('action', 'ban') !!}
+<button type="submit" class="btn btn-sm btn-warning navbar-btn"><i class="fa fa-ban"></i> {{trans('manage.ban')}}</button>
+{!! Form::close() !!}
+
+{!! Form::open(['method' => 'post', 'route' => 'user.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.disable')]) !!}
+{!! Form::hidden('action', 'disable') !!}
+<button type="submit" class="btn btn-sm btn-default navbar-btn"><i class="fa fa-power-off"></i> {{trans('manage.disable')}}</button>
+{!! Form::close() !!}
+@endif
+@if(cando('remove_other_users'))
+{!! Form::open(['method' => 'post', 'route' => 'user.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.remove')]) !!}
 {!! Form::hidden('action', 'remove') !!}
-<div class="hidden select_items"></div>
 <button type="submit" class="btn btn-sm btn-danger navbar-btn"><i class="fa fa-remove"></i> {{trans('manage.remove')}}</button>
 {!! Form::close() !!}
+@endif
+
 @stop
 
 @section('table_nav')

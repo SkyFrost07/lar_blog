@@ -6,7 +6,7 @@
         }
     });
 
-    $('.remove-form').submit(function () {
+    $('.action-form').submit(function () {
         var conf = confirm($(this).attr('title') + '?');
         if (conf) {
             var ids = [];
@@ -24,8 +24,8 @@
                     _token: _token,
                     item_ids: ids
                 },
-                success: function () {
-                    window.location.reload();
+                success: function (data) {
+                   window.location.reload();
                 },
                 error: function () {
                     window.location.reload();

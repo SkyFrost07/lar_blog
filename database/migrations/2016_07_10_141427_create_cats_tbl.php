@@ -28,7 +28,9 @@ class CreateCatsTbl extends Migration
            $table->integer('lang_id')->references('id')->on('langs')->onDelete('cascade');
            $table->string('name');
            $table->string('slug');
-           $table->string('description');
+           $table->text('description', 500);
+           $table->string('meta_keyword', 255);
+           $table->text('meta_desc', 500);
            $table->primary(['tax_id', 'lang_id']);
            $table->timestamps();
         });
