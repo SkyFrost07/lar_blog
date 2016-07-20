@@ -42,7 +42,7 @@ class Lang extends Model {
         }
     }
 
-    public function is_default() {
+    public function str_default() {
         if ($this->default == 1) {
             return 'Yes';
         }

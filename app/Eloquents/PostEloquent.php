@@ -78,12 +78,13 @@ class PostEloquent extends BaseEloquent {
             $item = $this->model->find($id);
             $item->update($fill_data);
             
-            $item->cats()->detach();
             if(isset($data['cat_ids'])){
+                $item->cats()->detach($item->cats()->lists('id')->toArray());
                 $item->cats()->attach($data['cat_ids']);
             }
             
             if(isset($data['tag_ids'])){
+                $item->tags()->detach($item->tags()->lists('id')->toArray());
                 $item->tags()->attach($data['tag_ids']);
             }
 

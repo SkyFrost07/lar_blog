@@ -3,23 +3,35 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
 use App\Eloquents\MenuEloquent;
 use App\Eloquents\MenuCatEloquent;
+use App\Eloquents\CatEloquent;
+use App\Eloquents\TagEloquent;
+use App\Eloquents\PostEloquent;
+use App\Eloquents\PageEloquent;
 
-class MenuController extends Controller
-{
+class MenuController extends Controller {
+
     protected $menu;
     protected $menucat;
+    protected $cat;
+    protected $tag;
+    protected $post;
+    protected $page;
 
-    public function __construct(MenuEloquent $menu, MenuCatEloquent $menucat) {
+    public function __construct(MenuEloquent $menu, MenuCatEloquent $menucat, CatEloquent $cat, TagEloquent $tag, PostEloquent $post, PageEloquent $page) {
         canAccess('manage_menus');
 
         $this->menu = $menu;
         $this->menucat = $menucat;
+
+        $this->cat = $cat;
+        $this->tag = $tag;
+        $this->post = $post;
+        $this->page = $page;
     }
 
     public function index(Request $request) {
@@ -30,8 +42,20 @@ class MenuController extends Controller
 
     public function create() {
         $parents = $this->menu->all(['orderby' => 'pivot_title']);
-        $groups = $this->menucat->all(['orderby' => 'pivot_name', 'fields' => 'id']);
-        return view('manage.menu.create', ['parents' => $parents, 'groups' => $groups]);
+        $groups = $this->menucat->all(['orderby' => 'pivot_name', 'fields' => ['id']]);
+
+        $cats = $this->cat->all(['orderby' => 'pivot_name', 'fields' => ['id']]);
+        $tags = $this->tag->all(['orderby' => 'pivot_name', 'fields' => ['id']]);
+        $posts = $this->post->all(['orderby' => 'pivot_title', 'fields' => ['id']]);
+        $pages = $this->page->all(['orderby' => 'pivot_title', 'fields' => ['id']]);
+        return view('manage.menu.create', [
+            'parents' => $parents, 
+            'groups' => $groups,
+            'cats' => $cats,
+            'tags' => $tags,
+            'posts' => $posts,
+            'pages' => $pages
+        ]);
     }
 
     public function store(Request $request) {
@@ -69,4 +93,5 @@ class MenuController extends Controller
     public function multiAction(Request $request) {
         return response()->json($result = $this->menu->actions($request));
     }
+
 }

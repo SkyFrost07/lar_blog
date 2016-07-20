@@ -1,0 +1,29 @@
+<style>
+    
+</style>
+
+<script src="../../jquery.min.js"></script>
+
+<script>
+    (function($){
+        $.ajax({
+           url: 'http://lar_blog.com/vi/test/files',
+           type: 'GET',
+           success: function(data){
+               data = JSON.parse(data);
+               console.log(data);
+               for(var i=0; i<data.length; i++){
+                  $('#files').append(' <a href="#" url="'+data[i].url+'">'+data[i].title+' </a> '); 
+               };
+           }
+        });
+        $('body').on('click', '#files a', function(e){
+            e.preventDefault();
+            alert($(this).attr('url'));
+        });
+    })(jQuery);
+</script>
+
+<div id="files">
+    <a href="#" url="first">First</a>
+</div>

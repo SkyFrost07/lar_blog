@@ -157,7 +157,7 @@ function current_locale() {
 function nested_option($items, $selected = 0, $parent = 0, $depth = 0) {
     $html = '';
     $intent = str_repeat('-- ', $depth);
-    if(!is_array($selected)){
+    if (!is_array($selected)) {
         $selected = [$selected];
     }
     if ($items) {
@@ -173,5 +173,11 @@ function nested_option($items, $selected = 0, $parent = 0, $depth = 0) {
 }
 
 function list_menu_types() {
-    return [0 => 'Custom', 1 => 'Post', 2 => 'Page', 3 => 'Cat', 4 => 'Tag'];
+    return [
+        0 => trans('menu.custom'),
+        1 => trans('menu.post'),
+        2 => trans('menu.page'),
+        3 => trans('menu.cat'),
+        4 => trans('menu.tag')
+    ];
 }

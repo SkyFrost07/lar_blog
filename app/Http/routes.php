@@ -1,6 +1,6 @@
 <?php
 
-Route::get('switch-languages/{code}', ['as' => 'switch_lang', 'uses' => 'HomeController@switchLang']);
+include 'ExtRoutes/test.php';
 
 Route::group(['namespace' => 'Auth'], function() {
     Route::group(['middleware' => 'throw'], function() {

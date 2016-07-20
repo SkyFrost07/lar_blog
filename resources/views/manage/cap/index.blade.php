@@ -12,6 +12,7 @@
 
 @if(cando('manage_caps'))
 <a href="{{route('cap.create')}}" class="btn btn-sm btn-success navbar-btn"><i class="fa fa-plus"></i> {{trans('manage.create')}}</a>
+
 {!! Form::open(['method' => 'post', 'route' => 'cap.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.remove')]) !!}
 {!! Form::hidden('action', 'remove') !!}
 <button type="submit" class="btn btn-sm btn-danger navbar-btn"><i class="fa fa-remove"></i> {{trans('manage.remove')}}</button>
@@ -51,7 +52,7 @@
                 <td>
                     <a href="{{route('cap.edit', ['id' => $item->id])}}" class="btn btn-sm btn-info" title="{{trans('manage.edit')}}"><i class="fa fa-edit"></i></a>
                     
-                    {!! Form::open(['method' => 'delete', 'route' => ['cap.destroy', $item->id], 'class' => 'form-inline remove-btn', 'title' => trans('manage.destroy')]) !!}
+                    {!! Form::open(['method' => 'delete', 'route' => ['cap.destroy', $item->id], 'class' => 'form-inline remove-btn', 'title' => trans('manage.remove')]) !!}
                     <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                     {!! Form::close() !!}
                 </td>

@@ -43,10 +43,10 @@ class MenuEloquent extends BaseEloquent {
 
     public function insert($data) {
         $this->validator($data, $this->rules());
-
-        $fillable = $this->model->getFillable();
-        $fill_data = array_only($data, $fillable);
-        $item = $this->model->create($fill_data);
+        
+        $item = $this->model->create($data);
+        
+        $menu_type = $data['menu_type'];
 
         foreach (get_langs() as $lang) {
             $lang_data = $data[$lang->code];

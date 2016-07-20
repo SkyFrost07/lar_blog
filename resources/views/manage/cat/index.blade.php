@@ -12,6 +12,7 @@
 
 @if(cando('manage_cats'))
 <a href="{{route('cat.create')}}" class="btn btn-sm btn-success navbar-btn"><i class="fa fa-plus"></i> {{trans('manage.create')}}</a>
+
 {!! Form::open(['method' => 'post', 'route' => 'cat.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.remove')]) !!}
 {!! Form::hidden('action', 'remove') !!}
 <button type="submit" class="btn btn-sm btn-danger navbar-btn"><i class="fa fa-remove"></i> {{trans('manage.remove')}}</button>

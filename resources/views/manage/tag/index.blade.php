@@ -56,7 +56,7 @@
                 <td>
                     <a href="{{route('tag.edit', ['id' => $item->id])}}" class="btn btn-sm btn-info" title="{{trans('manage.edit')}}"><i class="fa fa-edit"></i></a>
                     
-                    {!! Form::open(['method' => 'delete', 'route' => ['tag.destroy', $item->id], 'class' => 'form-inline remove-btn', 'title' => trans('manage.destroy')]) !!}
+                    {!! Form::open(['method' => 'delete', 'route' => ['tag.destroy', $item->id], 'class' => 'form-inline remove-btn', 'title' => trans('manage.remove')]) !!}
                     <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                     {!! Form::close() !!}
                 </td>
