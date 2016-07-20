@@ -20,7 +20,7 @@ and open the template in the editor.
         </script>
         @yield('head')
     </head>
-    <body class="@yield('class')">
+    <body>
         <header>
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
