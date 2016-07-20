@@ -27,23 +27,35 @@ $manage = config('app.manage_prefix', 'manage');
 Route::group(['prefix' => $manage, 'middleware' => 'auth', 'namespace' => 'Admin'], function() {
     Route::get('/', ['as' => 'dashboard', 'uses' => 'AdminController@index']);
 //    Roles
-    Route::post('/role/multi-actions', ['as' => 'role.m_action', 'uses' => 'RoleController@multiAction']);
-    Route::resource('role', 'RoleController', rsNames('role'));
+    Route::post('/roles/multi-actions', ['as' => 'role.m_action', 'uses' => 'RoleController@multiAction']);
+    Route::resource('roles', 'RoleController', rsNames('role'));
 //    Caps
-    Route::post('/cap/multi-actions', ['as' => 'cap.m_action', 'uses' => 'CapController@multiAction']);
-    Route::resource('cap', 'CapController', rsNames('cap'));
+    Route::post('/capabilities/multi-actions', ['as' => 'cap.m_action', 'uses' => 'CapController@multiAction']);
+    Route::resource('capabilities', 'CapController', rsNames('cap'));
 //    Users
-    Route::post('/user/multi-actions', ['as' => 'user.m_action', 'uses' => 'UserController@multiAction']);
-    Route::resource('user', 'UserController', rsNames('user'));
+    Route::post('/users/multi-actions', ['as' => 'user.m_action', 'uses' => 'UserController@multiAction']);
+    Route::resource('users', 'UserController', rsNames('user'));
 //    Languages
-    Route::resource('lang', 'LangController', rsNames('lang'));
-    Route::post('/lang/multi-actions', ['as' => 'lang.m_action', 'uses' => 'LangController@multiAction']);
+    Route::resource('languages', 'LangController', rsNames('lang'));
+    Route::post('/languages/multi-actions', ['as' => 'lang.m_action', 'uses' => 'LangController@multiAction']);
 //    Categories
-    Route::resource('cat', 'CatController', rsNames('cat'));
-    Route::post('/cat/multi-actions', ['as' => 'cat.m_action', 'uses' => 'CatController@multiAction']);
+    Route::resource('categories', 'CatController', rsNames('cat'));
+    Route::post('/categories/multi-actions', ['as' => 'cat.m_action', 'uses' => 'CatController@multiAction']);
 //    Tags
-    Route::resource('tag', 'TagController', rsNames('tag'));
-    Route::post('/tag/multi-actions', ['as' => 'tag.m_action', 'uses' => 'TagController@multiAction']);
+    Route::resource('tags', 'TagController', rsNames('tag'));
+    Route::post('/tags/multi-actions', ['as' => 'tag.m_action', 'uses' => 'TagController@multiAction']);
+//    Menu cats
+    Route::resource('menu-groups', 'MenuCatController', rsNames('menucat'));
+    Route::post('/menu-groups/multi-actions', ['as' => 'menucat.m_action', 'uses' => 'MenuCatController@multiAction']);
+//    Menu
+    Route::resource('menus', 'MenuController', rsNames('menu'));
+    Route::post('/menus/multi-actions', ['as' => 'menu.m_action', 'uses' => 'MenuController@multiAction']);
+//    Post
+    Route::resource('posts', 'PostController', rsNames('post'));
+    Route::post('/posts/multi-actions', ['as' => 'post.m_action', 'uses' => 'PostController@multiAction']);
+//    Page
+    Route::resource('pages', 'PageController', rsNames('page'));
+    Route::post('/pages/multi-actions', ['as' => 'page.m_action', 'uses' => 'PageController@multiAction']);
 });
 
 //});

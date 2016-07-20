@@ -76,5 +76,46 @@ class Lang extends Model {
         }
         return null;
     }
+    
+    public function menucats(){
+        return $this->belongsToMany('\App\Models\MenuCat', 'tax_desc', 'lang_id', 'tax_id')
+                ->withPivot('name', 'slug')
+                ->where('type', 'menucat');
+    }
+    
+    public function menucat_pivot($menu_cat_id){
+        $item = $this->menucats()->find($menu_cat_id, ['id']);
+        if($item){
+            return $item->pivot;
+        }
+        return null;
+    }
+    
+    public function menus(){
+        return $this->belongsToMany('\App\Models\Menu', 'menu_desc', 'lang_id', 'menu_id')
+                ->withPivot('title', 'slug', 'link');
+    }
+    
+    public function menu_pivot($menu_id){
+        $item = $this->menus()->find($menu_id);
+        if($item){
+            return $item->pivot;
+        }
+        return null;
+    }
+    
+    public function posts(){
+        return $this->belongsToMany('\App\Models\Post', 'post_desc', 'lang_id', 'post_id')
+                ->withPivot('title', 'slug', 'excerpt', 'content', 'custom', 'meta_keyword', 'meta_desc')
+                ->where('post_type', 'post');
+    }
+    
+    public function post_pivot($post_id){
+        $item = $this->posts()->find($post_id);
+        if($item){
+            return $item->pivot;
+        }
+        return null;
+    }
 
 }

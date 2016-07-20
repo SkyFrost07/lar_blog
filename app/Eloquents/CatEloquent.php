@@ -97,7 +97,8 @@ class CatEloquent extends BaseEloquent {
         foreach (get_langs() as $lang) {
             $lang->cats()->detach($ids);
         }
-        parent::destroy($ids);
+        
+        return parent::destroy($ids);
     }
 
     public function tableCats($items, $parent = 0, $depth=0) {

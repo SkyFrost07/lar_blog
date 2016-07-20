@@ -165,6 +165,7 @@ return [
          * My custom
          */
         Collective\Html\HtmlServiceProvider::class,
+         App\Providers\ComposerProvider::class,
 
     ],
 

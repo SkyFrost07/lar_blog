@@ -41,7 +41,7 @@ class RoleController extends Controller
     
     public function edit($id){
         $item = $this->role->find($id);
-        $caps = $this->cap->all();
+        $caps = $this->cap->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => -1]);
         return view('manage.role.edit', ['item' => $item, 'caps' => $caps]);
     }
     

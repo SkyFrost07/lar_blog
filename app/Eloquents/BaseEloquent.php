@@ -28,7 +28,7 @@ abstract class BaseEloquent {
     }
     
     public function get_author_id($id, $author_field='author_id'){
-        $item = $this->model->find($id, $author_field);
+        $item = $this->model->find($id, [$author_field]);
         if($item){
             return $item->$author_field;
         }

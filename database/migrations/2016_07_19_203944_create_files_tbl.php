@@ -18,8 +18,8 @@ class CreateFilesTbl extends Migration
            $table->string('url');
            $table->string('type')->default('image');
            $table->string('mimetype');
-           $table->integer('cat_id')->references('id')->on('taxs')->onDelete('set default');
-           $table->integer('user_id')->references('id')->on('users')->onDelete('set default');
+           $table->integer('cat_id')->references('id')->on('taxs')->onDelete('set null');
+           $table->integer('author_id')->references('id')->on('users')->onDelete('set null');
            $table->timestamps();
         });
     }

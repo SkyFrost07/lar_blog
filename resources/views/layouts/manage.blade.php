@@ -74,7 +74,7 @@ and open the template in the editor.
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-xs-3 col-sm-2 menu_col">
-
+                        @include('manage.parts.menubar')
                     </div>
                     <div class="col-xs-9 col-sm-10 content_col">
                         <h2 class="page-header">@yield('page_title', 'Manage')</h2>

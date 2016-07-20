@@ -3,16 +3,15 @@
 namespace App\Eloquents;
 
 use App\Eloquents\BaseEloquent;
-use Illuminate\Validation\ValidationException;
 
-class TagEloquent extends BaseEloquent {
+class MenuCatEloquent extends BaseEloquent {
 
     protected $model;
 
-    public function __construct(\App\Models\Tag $model) {
+    public function __construct(\App\Models\MenuCat $model) {
         $this->model = $model;
     }
-
+    
     public function rules() {
         $code = app()->getLocale();
         $rules = [];
@@ -32,7 +31,7 @@ class TagEloquent extends BaseEloquent {
 
         $opts = array_merge($opts, $args);
 
-        $result = current_lang()->tags()
+        $result = current_lang()->menucats()
                 ->where('name', 'like', '%' . $opts['key'] . '%')
                 ->whereNotIn('id', $opts['exclude'])
                 ->select($opts['fields'])
@@ -49,7 +48,7 @@ class TagEloquent extends BaseEloquent {
         $this->validator($data, $this->rules());
 
         $fillable = $this->model->getFillable();
-        $data['type'] = 'tag';
+        $data['type'] = 'menucat';
         $fill_data = array_only($data, $fillable);
         $item = $this->model->create($fill_data);
 
@@ -58,9 +57,9 @@ class TagEloquent extends BaseEloquent {
             $name = $lang_data['name'];
             $slug = $lang_data['slug'];
             $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
-
-            if ($name) {
-                $lang->tags()->attach($item->id, $lang_data);
+            
+            if($name){
+                $lang->menucats()->attach($item->id, $lang_data);
             }
         }
     }
@@ -77,14 +76,14 @@ class TagEloquent extends BaseEloquent {
             $name = $lang_data['name'];
             $slug = $lang_data['slug'];
             $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
-
-            $lang->tags()->sync([$id => $lang_data], false);
+                
+            $lang->menucats()->sync([$id =>$lang_data], false);
         }
     }
 
     public function destroy($ids) {
         foreach (get_langs() as $lang) {
-            $lang->tags()->detach($ids);
+            $lang->menucats()->detach($ids);
         }
         return parent::destroy($ids);
     }

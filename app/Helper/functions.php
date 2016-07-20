@@ -98,13 +98,13 @@ function selected($current, $values, $echo = true, $selected = "checked") {
     }
 }
 
-function isActive($route, $status=null, $active = 'active') {
+function isActive($route, $status = null, $active = 'active') {
     $request = request();
     $current_route = $request->route()->getName();
     if ($route == $current_route) {
         if ($request->has('status')) {
             $current_status = $request->get('status');
-            if($status == $current_status){
+            if ($status == $current_status) {
                 return $active;
             }
             return null;
@@ -114,15 +114,14 @@ function isActive($route, $status=null, $active = 'active') {
     return null;
 }
 
-
 // Languages
-function hasLang($code){
+function hasLang($code) {
     return Lang::hasLang($code);
 }
 
-function switch_lang_url($locale){
+function switch_lang_url($locale) {
     $request = request();
-    if(!hasLang($locale)){
+    if (!hasLang($locale)) {
         $locale = config('app.fallback_locale');
     }
     app()->setLocale($locale);
@@ -131,39 +130,48 @@ function switch_lang_url($locale){
     return implode('/', $segments);
 }
 
-function localActive($code, $active='active'){
+function localActive($code, $active = 'active') {
     $current_code = app()->getLocale();
-    if($code == $current_code){
+    if ($code == $current_code) {
         return $active;
     }
     return null;
 }
 
-function get_langs(){
+function get_langs() {
     return Lang::all();
 }
 
-function current_lang(){
+function current_lang() {
     return Lang::current();
 }
 
-function current_lang_id(){
+function current_lang_id() {
     return Lang::current()->id;
 }
 
-function current_locale(){
+function current_locale() {
     return app()->getLocale();
 }
 
-function nested_option($items, $selected=0, $parent=0, $depth=0){
+function nested_option($items, $selected = 0, $parent = 0, $depth = 0) {
     $html = '';
     $intent = str_repeat('-- ', $depth);
-    foreach ($items as $item){
-        if($item->parent_id == $parent){
-            $select = ($item->id == $selected) ? 'selected' : '';
-            $html .= '<option value="'.$item->id.'" '.$select.'>'.$intent.$item->pivot->name.'</option>';
-            $html .= nested_option($items, $selected, $item->id, $depth+1);
+    if(!is_array($selected)){
+        $selected = [$selected];
+    }
+    if ($items) {
+        foreach ($items as $item) {
+            if ($item->parent_id == $parent) {
+                $select = in_array($item->id, $selected) ? 'selected' : '';
+                $html .= '<option value="' . $item->id . '" ' . $select . '>' . $intent . $item->pivot->name . '</option>';
+                $html .= nested_option($items, $selected, $item->id, $depth + 1);
+            }
         }
     }
     return $html;
+}
+
+function list_menu_types() {
+    return [0 => 'Custom', 1 => 'Post', 2 => 'Page', 3 => 'Cat', 4 => 'Tag'];
 }
