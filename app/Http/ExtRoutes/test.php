@@ -1,15 +1,38 @@
 <?php
 
-Route::group(['prefix' => 'test'], function(){
-    Route::get('/editor', ['uses' => 'TestController@editor']);
-    Route::get('/get-content', ['uses' => 'TestController@getContent']);
-    Route::get('/files', function(){
-       return json_encode([
-           ['title' => 'File 1', 'url' => 'url 1'],
-           ['title' => 'File 2', 'url' => 'url 2'],
-           ['title' => 'File 3', 'url' => 'url 3'],
-           ['title' => 'File 4', 'url' => 'url 4'],
-       ]); 
-    });
+Route::get('/files/dialog', function(){
+   return view('files.dialog'); 
 });
 
+use Illuminate\Http\Request;
+use App\Eloquents\FileEloquent;
+use Illuminate\Validation\ValidationException;
+use DB;
+
+Route::group(['prefix' => 'test'], function(){
+    Route::get('/editor', function(){
+       return view('test.editor'); 
+    });
+    Route::get('/upload', function(){
+        return view('test.upload');
+    });
+    Route::post('/upload', function(Request $request, FileEloquent $elFile){
+        if($request->hasFile('files')){
+            $files = $request->file('files');
+            DB::beginTransaction();
+            foreach ($files as $file){
+                try{
+                    $elFile->insert($file);
+                    DB::commit();
+                    return 'uploaded';
+                }catch(ValidationException $ex){
+                    DB::rollBack();
+                    return redirect()->back()->withInput()->withErrors($ex->validator);
+                }
+            }
+        }else{
+            return redirect()->back();
+            
+        }
+    });
+});
