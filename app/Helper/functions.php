@@ -181,3 +181,12 @@ function list_menu_types() {
         4 => trans('menu.tag')
     ];
 }
+
+function makeRandDir($length=16, $model){
+    $dir = str_random($length);
+    $item = $model->where('rand_dir', $dir)->first();
+    if($item){
+        $dir = makeRandDir($length, $model);
+    }
+    return $dir;
+}

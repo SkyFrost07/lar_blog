@@ -3,18 +3,22 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Test</title>
-        
+        <title>.......</title>
+
         <link rel="stylesheet" href="/css/bootstrap.min.css">
         <link rel="stylesheet" href="/css/font-awesome.min.css">
-        
+
         <script src="/js/jquery.min.js"></script>
     </head>
     <body>
         <div class="container">
-            @yield('content')
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                    @yield('content')
+                </div>
+            </div>
         </div>
-        
+
         <script src="/js/bootstrap.min.js"></script>
     </body>
 </html>

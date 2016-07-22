@@ -19,6 +19,24 @@ return [
      * My custom
      */
     'manage_prefix' => 'manage',
+    'upload_dir' => 'uploads/',
+    'image_sizes' => [
+        'thumbnail' => [
+            'width' => 80,
+            'height' => 80,
+            'crop' => true
+        ],
+        'medium' => [
+            'width' => 300,
+            'height' => 200,
+            'crop' => true
+        ],
+        'large' => [
+            'width' => 600,
+            'height' => null,
+            'crop' => false
+        ]
+    ],
     
     /*
     |--------------------------------------------------------------------------
