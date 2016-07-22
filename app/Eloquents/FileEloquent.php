@@ -3,8 +3,6 @@
 namespace App\Eloquents;
 
 use App\Eloquents\BaseEloquent;
-use Illuminate\Validation\ValidationException;
-use App\Exceptions\MoveFileException;
 use Storage;
 use Image;
 
@@ -18,92 +16,119 @@ class FileEloquent extends BaseEloquent {
 
     public function rules() {
         return [
-            'files.*' => 'mimes:jpeg,png,gif,bmp,svg|max:10240'
+            'file' => 'mimes:jpeg,png,gif,bmp,svg|max:10240'
         ];
     }
 
+    public function all($args = []) {
+        $opts = [
+            'fields' => ['*'],
+            'orderby' => 'created_at',
+            'order' => 'desc',
+            'per_page' => 20,
+            'key' => '',
+            'page' => 1
+        ];
+
+        $opts = array_merge($opts, $args);
+
+        $result = $this->model
+                ->where('name', 'like', '%' . $opts['key'] . '%')
+                ->select($opts['fields'])
+                ->orderBy($opts['orderby'], $opts['order']);
+        if ($opts['per_page'] == -1) {
+            $result = $result->get();
+        } else {
+            $result = $result->paginate($opts['per_page']);
+        }
+        return $result;
+    }
+
     public function insert($file) {
-        $size = $file->getClientSize();
-        $name = $file->getClientOriginalName();
-        $mimetype = $file->getClientMimeType();
-        $extension = $file->getClientOriginalExtension();
-        $type = $extension;
+        if ($this->validator(['file' => $file])) {
+//            $size = $file->getClientSize();
+            $name = $file->getClientOriginalName();
+            $mimetype = $file->getClientMimeType();
+            $extension = $file->getClientOriginalExtension();
+            $type = $extension;
 
-        if (in_array($extension, ['jpeg', 'png', 'bmp', 'gif', 'svg'])) {
-
-            $type = 'image';
             $upload_dir = config('app.upload_dir');
-            $rand_dir = makeRandDir(16, $this->model);
-            $m_image = Image::make($file);
-            $width = $m_image->width();
-            $height = $m_image->height();
-            $ratio = $width / $height;
+            $rand_dir = makeRandDir(13, $this->model);
 
-            $sizes = config('app.image_sizes');
+            if (in_array($extension, ['jpeg', 'png', 'bmp', 'gif', 'svg'])) {
 
-            if ($sizes) {
-                foreach ($sizes as $key => $value) {
-                    $w = $value['width'];
-                    $h = $value['height'];
+                $type = 'image';
+                $m_image = Image::make($file);
+                $width = $m_image->width();
+                $height = $m_image->height();
+                $ratio = $width / $height;
 
-                    if ($w == null && $h == null) {
-                        continue;
-                    }
+                $sizes = config('app.image_sizes');
 
-                    $rspath = $upload_dir . $key . '/' . $rand_dir . '/' . intval($w) . 'x' . intval($h) . '.' . $extension;
+                if ($sizes) {
+                    foreach ($sizes as $key => $value) {
+                        $w = $value['width'];
+                        $h = $value['height'];
 
-                    $crop = $value['crop'];
-                    $r = ($h == null) ? 0 : $w / $h;
-
-                    if ($width > $w && $height > $h) {
-                        if ($ratio > $r) {
-                            $rh = $h;
-                            $rw = ($h == null) ? $w : $width * $h / $height;
-                        } else {
-                            $rw = $w;
-                            $rh = ($w == null) ? $h : $height * $w / $width;
-                        }
-                        $sh = round(($rh - $h) / 2);
-                        $sw = round(($rw - $w) / 2);
-
-                        $rsImage = Image::make($file)->resize($rw, $rh, function($constraint) {
-                            $constraint->aspectRatio();
-                        });
-                        if ($crop) {
-                            $rsImage->crop($w, $h, $sw, $sh);
+                        if ($w == null && $h == null) {
+                            continue;
                         }
 
-                        Storage::disk()->put($rspath, $rsImage->stream()->__toString());
+                        $rspath = $upload_dir . $key . '/' . $rand_dir . '/' . intval($w) . 'x' . intval($h) . '.' . $extension;
+
+                        $crop = $value['crop'];
+                        $r = ($h == null) ? 0 : $w / $h;
+
+                        if ($width > $w && $height > $h) {
+                            if ($ratio > $r) {
+                                $rh = $h;
+                                $rw = ($h == null) ? $w : $width * $h / $height;
+                            } else {
+                                $rw = $w;
+                                $rh = ($w == null) ? $h : $height * $w / $width;
+                            }
+                            $sh = round(($rh - $h) / 2);
+                            $sw = round(($rw - $w) / 2);
+
+                            $rsImage = Image::make($file)->resize($rw, $rh, function($constraint) {
+                                $constraint->aspectRatio();
+                            });
+                            if ($crop) {
+                                $rsImage->crop($w, $h, $sw, $sh);
+                            }
+
+                            Storage::disk()->put($rspath, $rsImage->stream()->__toString());
+                        }
                     }
                 }
             }
+
+            $fullpath = $upload_dir . 'full/' . $rand_dir . '/' . $name;
+            Storage::disk()->put($fullpath, file_get_contents($file));
+
+            $item = new $this->model();
+            $item->name = $name;
+            $item->url = $fullpath;
+            $item->type = $type;
+            $item->mimetype = $mimetype;
+            $item->rand_dir = $rand_dir;
+            $item->author_id = 1;
+
+            return $item->save();
         }
-
-        $fullpath = $upload_dir . 'full/' . $rand_dir;
-        $file->move($fullpath, $name);
-
-        $item = new $this->model();
-        $item->name = $name;
-        $item->url = $fullpath . '/' . $name;
-        $item->type = $type;
-        $item->mimetype = $mimetype;
-        $item->rand_dir = $rand_dir;
-        $item->author_id = 1;
-
-        return $item->save();
     }
 
     public function destroy($ids) {
         if (!is_array($ids)) {
             $ids = [$ids];
         }
-        
+
         $sizes = config('app.image_sizes');
         $sizes['full'] = [];
         $dir = config('app.upload_dir');
-        
+
         foreach ($ids as $id) {
-            $image = $this->model->find($id);
+            $image = $this->model->find($id, ['id', 'rand_dir']);
             if ($image) {
                 foreach ($sizes as $key => $size) {
                     $path = $dir . $key . '/' . $image->rand_dir;

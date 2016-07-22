@@ -32,7 +32,10 @@ class RoleEloquent extends BaseEloquent{
         
         $opts = array_merge($opts, $args);
         
-        return $this->model->search($opts['key'])->orderby($opts['orderby'], $opts['order'])->paginate($opts['per_page']);
+        return $this->model
+                ->search($opts['key'])
+                ->orderby($opts['orderby'], $opts['order'])
+                ->paginate($opts['per_page']);
     }
     
     public function getDefaultId(){

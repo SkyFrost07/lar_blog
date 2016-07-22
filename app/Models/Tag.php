@@ -15,7 +15,8 @@ class Tag extends Model
             $locale = current_locale();
         }
         return $this->belongsToMany('\App\Models\Lang', 'tax_desc', 'tax_id', 'lang_id')
-                ->withPivot('name')->where('code', $locale)->first([]);
+                ->withPivot('name')
+                ->where('code', $locale)->first([]);
     }
     
     public function current_locale(){

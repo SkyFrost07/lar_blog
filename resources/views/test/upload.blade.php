@@ -4,6 +4,10 @@
 
 <h1>Files</h1>
 
+@if($errors)
+<pre><?php print_r($errors); ?></pre>
+@endif
+
 {!! Form::open(['method' => 'post', 'url' => '/vi/test/upload', 'files' => true]) !!}
 
 <div class="form-group">
