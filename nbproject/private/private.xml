@@ -2,6 +2,17 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/views/manage/post/index.blade.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Eloquents/PostEloquent.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Models/Post.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/views/manage/post/edit.blade.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Helper/functions.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/views/manage/post/create.blade.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Eloquents/CatEloquent.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Eloquents/BaseEloquent.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/resources/lang/vi/menu.php</file>
+            <file>file:/E:/wamp/www/lar_pj/lar_blog/app/Http/Controllers/Admin/PostController.php</file>
+        </group>
     </open-files>
 </project-private>
