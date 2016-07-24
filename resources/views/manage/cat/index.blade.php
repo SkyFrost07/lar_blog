@@ -35,8 +35,8 @@
         <thead>
             <tr>
                 <th width="30"><input type="checkbox" name="massdel" class="checkall"/></th>
-                <th>ID {!! link_order('id') !!}</th>
-                <th>{{trans('manage.name')}} {!! link_order('pivot_name') !!}</th>
+                <th>ID {!! link_order('taxs.id') !!}</th>
+                <th>{{trans('manage.name')}} {!! link_order('td.name') !!}</th>
                 <th>{{trans('manage.slug')}}</th>
                 <th>{{trans('manage.parent')}} {!! link_order('parent_id') !!}</th>
                 <th>{{trans('manage.order')}} {!! link_order('order') !!}</th>

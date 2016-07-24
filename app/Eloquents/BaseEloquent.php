@@ -9,6 +9,11 @@ use Session;
 abstract class BaseEloquent {
 
     protected $error;
+    protected $locale;
+
+    public function __construct() {
+        $this->locale = app()->getLocale();
+    }
 
     public function validator(array $attrs, array $rule = [], array $message = []) {
         $valid = Validator::make($attrs, ($rule) ? $rule : $this->rules(), $message);
@@ -21,6 +26,10 @@ abstract class BaseEloquent {
 
     public function getError() {
         return $this->error;
+    }
+    
+    public function getLangs($fields=['id', 'code', 'name']){
+        return $this->lang->all($fields);
     }
 
     public function find($id) {

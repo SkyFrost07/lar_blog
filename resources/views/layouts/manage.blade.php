@@ -93,6 +93,7 @@ and open the template in the editor.
 
         <script src="/js/bootstrap.min.js"></script>
         <script src="/adminsrc/js/main.js"></script>
+        
         @yield('foot')
     </body>
 </html>

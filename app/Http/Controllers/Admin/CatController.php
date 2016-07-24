@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Eloquents\CatEloquent;
 use Illuminate\Validation\ValidationException;
 use App\Exceptions\DbException;
+use DB;
 
 class CatController extends Controller {
 
@@ -20,41 +21,47 @@ class CatController extends Controller {
     }
 
     public function index(Request $request) {
-        $data = $request->all();
-        $cats = $this->cat->all($data);
-        $tableCats = $this->cat->tableCats($cats, 0);
+        $cats = $this->cat->all($request->all()); 
+        $tableCats = $this->cat->tableCats($cats); 
         return view('manage.cat.index', ['items' => $cats, 'tableCats' => $tableCats]);
     }
 
     public function create() {
         $parents = $this->cat->all([
-            'fields' => ['id', 'parent_id'],
+            'fields' => ['taxs.id', 'taxs.parent_id', 'td.name'],
             'per_page' => -1,
-            'orderby' => 'pivot_name'
+            'orderby' => 'td.name'
         ]);
-        return view('manage.cat.create', ['parents' => $parents]);
+        return view('manage.cat.create', ['parents' => $parents, 'lang' => $this->locale]);
     }
 
     public function store(Request $request) {
+        DB::beginTransaction();
         try {
             $this->cat->insert($request->all());
+            DB::commit();
             return redirect()->back()->with('succ_mess', trans('manage.store_success'));
         } catch (ValidationException $ex) {
             return redirect()->back()->withInput()->withErrors($ex->validator);
         } catch (DbException $ex) {
+            DB::rollBack();
             return redirect()->back()->withInput()->with('error_mess', $ex->getMess());
         }
     }
 
-    public function edit($id) {
-        $item = $this->cat->find($id);
+    public function edit($id, Request $request) {
+        $lang = current_locale();
+        if($request->has('lang')){
+            $lang = $request->get('lang');
+        }
+        $item = $this->cat->findByLang($id, ['taxs.*', 'td.*'], $lang);
         $parents = $this->cat->all([
-            'fields' => ['id', 'parent_id'],
+            'fields' => ['taxs.id', 'taxs.parent_id', 'td.name'],
             'exclude' => [$id],
             'per_page' => -1,
-            'orderby' => 'pivot_name'
+            'orderby' => 'td.name'
         ]);
-        return view('manage.cat.edit', ['item' => $item, 'parents' => $parents]);
+        return view('manage.cat.edit', compact('lang', 'item', 'parents'));
     }
 
     public function update($id, Request $request) {

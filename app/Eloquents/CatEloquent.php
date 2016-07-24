@@ -12,33 +12,43 @@ class CatEloquent extends BaseEloquent {
     protected $model;
 
     public function __construct(\App\Models\Cat $model) {
+        parent::__construct();
+
         $this->model = $model;
     }
 
-    public function rules() {
-        $code = app()->getLocale();
-        $rules = [];
-        $rules[$code . '.name'] = 'required';
-        return $rules;
+    public function rules($update = null) {
+        $code = current_locale();
+        if (!$update) {
+            return [
+                $code . '.name' => 'required'
+            ];
+        } else {
+            return [
+                'locale.name' => 'required',
+                'lang' => 'required'
+            ];
+        }
     }
 
     public function all($args = []) {
         $opts = [
-            'fields' => ['*'],
-            'orderby' => 'id',
+            'fields' => ['taxs.*', 'td.*'],
+            'orderby' => 'td.name',
             'order' => 'asc',
             'per_page' => 20,
             'exclude' => [],
             'key' => '',
         ];
-
         $opts = array_merge($opts, $args);
 
-        $result = current_lang()->cats()
-                ->where('name', 'like', '%' . $opts['key'] . '%')
-                ->whereNotIn('id', $opts['exclude'])
+        $result = $this->model->joinLang()
+                ->where('type', 'cat')
+                ->where('td.name', 'like', '%' . $opts['key'] . '%')
+                ->whereNotIn('taxs.id', $opts['exclude'])
                 ->select($opts['fields'])
-                ->orderby($opts['orderby'], $opts['order']);
+                ->orderBy($opts['orderby'], $opts['order']);
+
         if ($opts['per_page'] == -1) {
             $result = $result->get();
         } else {
@@ -47,70 +57,75 @@ class CatEloquent extends BaseEloquent {
         return $result;
     }
 
-    public function findByName($name, $fields = ['*']) {
-        return $this->model->where('name', $name)->select($fields)->first();
-    }
-
-    public function show($id, $args) {
-        
-    }
-
     public function insert($data) {
         $this->validator($data, $this->rules());
 
         $fillable = $this->model->getFillable();
         $fill_data = array_only($data, $fillable);
         $item = $this->model->create($fill_data);
-        
-        if(isset($fill_data['parent_id']) && $fill_data['parent_id']){
+
+        if (isset($fill_data['parent_id']) && $fill_data['parent_id']) {
             $item->relations()->attach($fill_data['parent_id']);
         }
 
-        foreach (get_langs() as $lang) {
+        foreach (get_langs(['fields' => ['id', 'code']]) as $lang) {
             $lang_data = $data[$lang->code];
             $name = $lang_data['name'];
             $slug = $lang_data['slug'];
             $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
 
-            $lang->cats()->attach($item->id, $lang_data);
+            $item->langs()->attach($lang->id, $lang_data);
         }
+    }
+
+    public function findByLang($id, $fields = ['taxs.*', 'td.*'], $lang = null) {
+        $item = $this->model->joinLang($lang)
+                ->find($id, $fields);
+        return $item;
     }
 
     public function update($id, $data) {
-        $this->validator($data, $this->rules());
+        $this->validator($data, $this->rules(true));
 
         $fillable = $this->model->getFillable();
         $fill_data = array_only($data, $fillable);
-        $this->model->where('id', $id)->update($fill_data);
+        $item = $this->model->findOrFail($id);
+        $item->update($fill_data);
 
-        foreach (get_langs() as $lang) {
-            $lang_data = $data[$lang->code];
-            $name = $lang_data['name'];
-            $slug = $lang_data['slug'];
-            $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
-                
-            $lang->cats()->updateExistingPivot($id, $lang_data);
-        }
+        $lang_id = get_lang_id($data['lang']);
+
+        $lang_data = $data['locale'];
+        $name = $lang_data['name'];
+        $slug = $lang_data['slug'];
+        $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
+
+        $item->langs()->sync([$lang_id => $lang_data], false);
     }
 
     public function destroy($ids) {
-        foreach (get_langs() as $lang) {
-            $lang->cats()->detach($ids);
+        if (!is_array($ids)) {
+            $ids = [$ids];
         }
-        
+        if ($ids) {
+            foreach ($ids as $id) {
+                $item = $this->model->find($id);
+                $item->langs()->detach();
+            }
+        }
+
         return parent::destroy($ids);
     }
 
-    public function tableCats($items, $parent = 0, $depth=0) {
+    public function tableCats($items, $parent = 0, $depth = 0) {
         $html = '';
         $indent = str_repeat("-- ", $depth);
         foreach ($items as $item) {
-            if ($item->parent_id == $parent) {
+            if ($item->parent_id == $parent && $item->name) {
                 $html .= '<tr>';
                 $html .= '<td><input type="checkbox" name="checked[]" class="checkitem" value="' . $item->id . '" /></td>
                 <td>' . $item->id . '</td>
-                <td>' . $indent.' '.$item->pivot->name . '</td>
-                <td>' . $item->pivot->slug . '</td>
+                <td>' . $indent . ' ' . $item->name . '</td>
+                <td>' . $item->slug . '</td>
                 <td>' . $item->parent_name() . '</td>
                 <td>' . $item->order . '</td>
                 <td>' . $item->count . '</td>
@@ -123,7 +138,7 @@ class CatEloquent extends BaseEloquent {
                     ' . Form::close() . '
                 </td>';
                 $html .= '</tr>';
-                $html .= $this->tableCats($items, $item->id, $depth+1);
+                $html .= $this->tableCats($items, $item->id, $depth + 1);
             }
         }
         return $html;

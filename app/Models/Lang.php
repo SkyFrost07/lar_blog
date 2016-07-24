@@ -12,17 +12,13 @@ class Lang extends Model {
     public function switch_url() {
         $request = request();
         $locale = $this->code;
-        if (!hasLang($locale)) {
+        if (!has_lang($locale)) {
             $locale = config('app.fallback_locale');
         }
         app()->setLocale($locale);
         $segments = $request->segments(); 
         $segments[0] = $locale;
-        return $request->getHost.'/'.implode('/', $segments);
-    }
-
-    public function scopeSearch($query, $key) {
-        return $query->where('name', 'like', "%$key%");
+        return '/'.implode('/', $segments);
     }
 
     public function icon() {

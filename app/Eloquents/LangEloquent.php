@@ -33,7 +33,7 @@ class LangEloquent extends BaseEloquent {
     public function all($args = []) {
         $opts = [
             'status' => 1,
-            'field' => ['*'],
+            'fields' => ['*'],
             'orderby' => 'order',
             'order' => 'asc',
             'per_page' => 20,
@@ -44,13 +44,20 @@ class LangEloquent extends BaseEloquent {
 
         $opts = array_merge($opts, $args);
 
-        return $this->model
+        $results = $this->model
                 ->where('status', $opts['status'])
                 ->whereNotIn('id', $opts['exclude'])
-                ->search($opts['key'])
-                ->orderby($opts['orderby'], $opts['order'])
-                ->select($opts['field'])
-                ->paginate($opts['per_page']);
+                ->where('name', 'like', '%'.$opts['key'].'%')
+                ->orderBy($opts['orderby'], $opts['order'])
+                ->select($opts['fields']);
+        
+        if($opts['per_page'] == -1){
+            $results = $results->get();
+        }else{
+            $results = $results->paginate($opts['per_page']);
+        }
+        
+        return $results;
     }
 
     function findByName($name, $fields = ['*']) {
@@ -61,13 +68,18 @@ class LangEloquent extends BaseEloquent {
         return $this->model->where('code', $code)->first($fields);
     }
     
-    public function currentLang($fields=['*']){
+    public function getId($code){
+        $item = $this->model->where('code', $code)->first(['id']);
+        if($item){
+            return $item->id;
+        }
+        return null;
+    }
+    
+    public function getCurrent($fields=['*']){
         $current_locale = app()->getLocale();
         $lang = $this->model->where('code', $current_locale)->first($fields);
-        if($lang){
-            return $lang;
-        }
-        return $this->model->first($fields);
+        return $lang;
     }
 
 }

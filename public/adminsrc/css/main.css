@@ -1,7 +1,25 @@
+a:hover {
+  text-decoration: none;
+}
 .form-inline {
   display: inline-block;
 }
 .nav-status .active a {
+  border-bottom: 2px solid tomato;
+}
+.lang_tabs {
+  list-style: none;
+  padding: 0;
+}
+.lang_tabs li {
+  display: inline-block;
+}
+.lang_tabs li a {
+  display: inline-block;
+  padding: 5px 15px;
+}
+.lang_tabs .active a,
+.lang_tabs li a:hover {
   border-bottom: 2px solid tomato;
 }
 /*# sourceMappingURL=main.css.map */

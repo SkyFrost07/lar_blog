@@ -1,8 +1,22 @@
+a{
+    &:hover{text-decoration: none;}
+}
+
 .form-inline{
     display: inline-block;
 }
 .nav-status{
     .active a{
+        border-bottom: 2px solid tomato;
+    }
+}
+.lang_tabs{
+    list-style: none; padding: 0;
+    li{
+        display: inline-block;
+        a{display: inline-block; padding: 5px 15px;}
+    } 
+    .active a, li a:hover{
         border-bottom: 2px solid tomato;
     }
 }

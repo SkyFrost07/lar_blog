@@ -11,19 +11,23 @@ class Lang{
         $this->lang = $lang;
     }
     
-    public function all(){
-        return $this->lang->all(['field' => ['id', 'name', 'code', 'icon']]);
+    public function all($args=[]){
+        return $this->lang->all($args);
     }
     
-    public function current(){
-        return $this->lang->currentLang(['id', 'name', 'code', 'icon']);
+    public function getCurrent($fields=['*']){
+        return $this->lang->getCurrent(['id', 'name', 'code', 'icon']);
     }
     
-    public function code(){
-        return $this->lang->currentLang(['code'])->code;
+    public function getId($code){
+        return $this->lang->getId($code);
     }
     
-    public function hasLang($code){
+    public function findByCode($code, $fields=['*']){
+        return $this->lang->get_lang($code, $fields);
+    }
+    
+    public function has($code){
         $item = $this->lang->findByCode($code, ['id']);
         if($item){
             return true;
