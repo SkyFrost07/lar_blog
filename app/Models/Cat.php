@@ -17,6 +17,11 @@ class Cat extends Model {
                             ->where('lg.code', '=', $lang);
                         });
     }
+    
+    public function langs() {
+        return $this->belongsToMany('\App\Models\Lang', 'tax_desc', 'tax_id', 'lang_id')
+                        ->where('type', 'cat');
+    }
 
     public function parent_name() {
         $item = $this->joinLang()
@@ -26,12 +31,7 @@ class Cat extends Model {
         if ($item) {
             return $item->name;
         }
-        return 0;
-    }
-
-    public function langs() {
-        return $this->belongsToMany('\App\Models\Lang', 'tax_desc', 'tax_id', 'lang_id')
-                        ->where('type', 'cat');
+        return null;
     }
 
     public function relations() {

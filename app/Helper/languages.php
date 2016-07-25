@@ -37,7 +37,7 @@ function lang_active($code, $active='active'){
     return null;
 }
 
-function get_langs($args=[]) {
+function get_langs($args=['fields' => ['id', 'code', 'name', 'icon']]) {
     return Lang::all($args);
 }
 

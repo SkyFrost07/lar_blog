@@ -9,21 +9,23 @@ class Menu extends Model
     protected $table = 'menus';
     protected $fillable = ['group_id', 'parent_id', 'menu_type', 'type_id', 'icon', 'open_type', 'order', 'status'];
     
+    public function joinLang($lang=null) {
+        $lang = ($lang) ? $lang : current_locale();
+        return self::join('menu_desc as md', 'menus.id', '=', 'md.menu_id')
+                        ->join('langs as lg', function($join) use($lang){
+                            $join->on('md.lang_id', '=', 'lg.id')
+                            ->where('lg.code', '=', $lang);
+                        });
+    }
+    
+    public function langs() {
+        return $this->belongsToMany('\App\Models\Lang', 'menu_desc', 'menu_id', 'lang_id');
+    }
+    
     public function group(){
-        return $this->belongsTo('App\Models\MenuCat', 'group_id', 'id')
-                ->select('id');
+        return $this->belongsTo('App\Models\MenuCat', 'group_id', 'id');
     }
-    
-    public function group_name(){
-        if($this->group_id){
-            $group = current_lang()->menucats()->find($this->group_id, ['id']);
-            if($group){
-                return $group->pivot->name;
-            }
-        }
-        return null;
-    }
-    
+
     public function status(){
         if($this->status == 1){
             return 'Active';

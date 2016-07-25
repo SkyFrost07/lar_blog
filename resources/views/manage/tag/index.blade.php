@@ -34,8 +34,8 @@
         <thead>
             <tr>
                 <th width="30"><input type="checkbox" name="massdel" class="checkall"/></th>
-                <th>ID {!! link_order('id') !!}</th>
-                <th>{{trans('manage.name')}} {!! link_order('pivot_name') !!}</th>
+                <th>ID {!! link_order('taxs.id') !!}</th>
+                <th>{{trans('manage.name')}} {!! link_order('td.name') !!}</th>
                 <th>{{trans('manage.slug')}}</th>
                 <th>{{trans('manage.order')}} {!! link_order('order') !!}</th>
                 <th>{{trans('manage.count')}} {!! link_order('count') !!}</th>
@@ -48,8 +48,8 @@
             <tr>
                 <td><input type="checkbox" name="checked[]" class="checkitem" value="{{ $item->id }}" /></td>
                 <td>{{$item->id}}</td>
-                <td>{{$item->pivot->name}}</td>
-                <td>{{$item->pivot->slug}}</td>
+                <td>{{$item->name}}</td>
+                <td>{{$item->slug}}</td>
                 <td>{{$item->order}}</td>
                 <td>{{$item->count}}</td>
                 <td>{{$item->status()}}</td>

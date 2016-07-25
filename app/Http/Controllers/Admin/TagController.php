@@ -38,9 +38,13 @@ class TagController extends Controller
         }
     }
 
-    public function edit($id) {
-        $item = $this->tag->find($id);
-        return view('manage.tag.edit', ['item' => $item]);
+    public function edit($id, Request $request) {
+        $lang = current_locale();
+        if($request->has('lang')){
+            $lang = $request->get('lang');
+        }
+        $item = $this->tag->findByLang($id, ['taxs.*', 'td.*'], $lang);
+        return view('manage.tag.edit', compact('item', 'lang'));
     }
 
     public function update($id, Request $request) {

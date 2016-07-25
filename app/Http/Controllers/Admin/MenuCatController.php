@@ -38,9 +38,13 @@ class MenuCatController extends Controller {
         }
     }
 
-    public function edit($id) {
-        $item = $this->menucat->find($id);
-        return view('manage.menucat.edit', ['item' => $item]);
+    public function edit($id, Request $request) {
+         $lang = current_locale();
+        if($request->has('lang')){
+            $lang = $request->get('lang');
+        }
+        $item = $this->menucat->findByLang($id, ['taxs.id', 'td.slug', 'td.name'], $lang);
+        return view('manage.menucat.edit', compact('item', 'lang'));
     }
 
     public function update($id, Request $request) {

@@ -10,19 +10,20 @@ class Tag extends Model
     
     protected $fillable = ['type', 'order', 'count', 'status'];
     
-    public function langs($locale=null){
-        if(is_null($locale)){
-            $locale = current_locale();
-        }
+    public function joinLang($lang=null) {
+        $lang = ($lang) ? $lang : current_locale();
+        return self::join('tax_desc as td', 'taxs.id', '=', 'td.tax_id')
+                        ->join('langs as lg', function($join) use($lang){
+                            $join->on('td.lang_id', '=', 'lg.id')
+                            ->where('lg.code', '=', $lang);
+                        });
+    }
+
+    public function langs() {
         return $this->belongsToMany('\App\Models\Lang', 'tax_desc', 'tax_id', 'lang_id')
-                ->withPivot('name')
-                ->where('code', $locale)->first([]);
+                        ->where('type', 'tag');
     }
-    
-    public function current_locale(){
-        return current_lang()->tags()->find($this->id, [])->pivot;
-    }
-    
+
     public function status(){
         switch ($this->status){
             case 0:

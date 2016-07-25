@@ -19,7 +19,7 @@ class MenuEloquent extends BaseEloquent {
     public function all($args = []) {
         $opts = [
             'fields' => ['*'],
-            'orderby' => 'pivot_title',
+            'orderby' => 'order',
             'order' => 'asc',
             'per_page' => 20,
             'exclude' => [],
@@ -28,11 +28,11 @@ class MenuEloquent extends BaseEloquent {
 
         $opts = array_merge($opts, $args);
 
-        $result = current_lang()->menus()
-                ->where('title', 'like', '%' . $opts['key'] . '%')
-                ->whereNotIn('id', $opts['exclude'])
+        $result = $this->model->joinLang()
+                ->where('md.name', 'like', '%' . $opts['key'] . '%')
+                ->whereNotIn('menus.id', $opts['exclude'])
                 ->select($opts['fields'])
-                ->orderby($opts['orderby'], $opts['order']);
+                ->orderBy($opts['orderby'], $opts['order']);
         if ($opts['per_page'] == -1) {
             $result = $result->get();
         } else {
@@ -44,15 +44,13 @@ class MenuEloquent extends BaseEloquent {
     public function insert($data) {
         $this->validator($data, $this->rules());
         
-        $item = $this->model->create($data);
+        $fillable = $this->model->getFillable();
+        $data['type'] = 'tag';
+        $fill_data = array_only($data, $fillable);
+        $item = $this->model->create($fill_data);
         
-        $menu_type = $data['menu_type'];
-
-        foreach (get_langs() as $lang) {
-            $lang_data = $data[$lang->code];
-
-            $lang->menus()->attach($item->id, $lang_data);
-        }
+        
+   
     }
 
     public function update($id, $data) {

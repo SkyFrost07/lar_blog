@@ -11,16 +11,9 @@
 
         {!! show_messes() !!}
 
-        <?php $langs = Lang::all(); ?>
-
         {!! Form::open(['method' => 'post', 'route' => 'menu.store']) !!}
 
-        <ul class="nav nav-tabs">
-            @foreach($langs as $lang)
-            <li class="{{ localActive($lang->code) }}"><a href="#tab-{{$lang->code}}" data-toggle="tab">{{$lang->name}}</a></li>
-            @endforeach
-        </ul>
-        <br />
+        @include('manage.parts.lang_tabs')
 
         <div class="tab-content">
             @foreach($langs as $lang)

@@ -44,6 +44,7 @@ class CatEloquent extends BaseEloquent {
 
         $result = $this->model->joinLang()
                 ->where('type', 'cat')
+                ->whereNotNull('td.name')
                 ->where('td.name', 'like', '%' . $opts['key'] . '%')
                 ->whereNotIn('taxs.id', $opts['exclude'])
                 ->select($opts['fields'])
@@ -91,6 +92,10 @@ class CatEloquent extends BaseEloquent {
         $fill_data = array_only($data, $fillable);
         $item = $this->model->findOrFail($id);
         $item->update($fill_data);
+        
+        if (isset($fill_data['parent_id']) && $fill_data['parent_id']) {
+            $item->relations()->sync($fill_data['parent_id']);
+        }
 
         $lang_id = get_lang_id($data['lang']);
 
