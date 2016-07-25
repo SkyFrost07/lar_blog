@@ -56,6 +56,10 @@ class PostEloquent extends BaseEloquent {
                 $cats = $item->cats();
                 $cats->attach($data['cat_ids']);
             }
+            
+            if (isset($data['tag_ids'])){
+                $item->tags()->attach($data['tag_ids']);
+            }
 
             foreach (get_langs() as $lang) {
                 $lang_data = $data[$lang->code];

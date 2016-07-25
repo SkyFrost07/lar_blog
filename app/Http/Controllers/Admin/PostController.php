@@ -40,7 +40,11 @@ class PostController extends Controller {
         if (cando('manage_posts')) {
             $users = $this->user->all(['orderby' => 'name', 'order' => 'asc', 'pre_page' => -1, 'fields' => ['id', 'name']]);
         }
-        return view('manage.post.create', ['cats' => $cats, 'tags' => $tags, 'users' => $users]);
+        return view('manage.post.create', [
+            'cats' => $cats,
+            'tags' => $tags,
+            'users' => $users
+        ]);
     }
 
     public function store(Request $request) {
@@ -59,8 +63,18 @@ class PostController extends Controller {
     public function edit($id) {
         canAccess('edit_my_post', $this->post->get_author_id($id));
 
-        $cats = $this->cat->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => -1, 'fields' => ['id', 'parent_id']]);
-        $tags = $this->tag->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => -1, 'fields' => ['id']]);
+        $cats = $this->cat->all([
+            'orderby' => 'name', 
+            'order' => 'asc', 
+            'per_page' => -1, 
+            'fields' => ['id', 'parent_id']
+            ]);
+        $tags = $this->tag->all([
+                    'orderby' => 'name',
+                    'order' => 'asc',
+                    'per_page' => -1,
+                    'fields' => ['id']
+                ]);
         $users = null;
         if (cando('manage_posts')) {
             $users = $this->user->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => 20, 'fields' => ['name', 'id']]);
@@ -69,12 +83,12 @@ class PostController extends Controller {
         $curr_cats = $item->cats->lists('id')->toArray();
         $curr_tags = $item->tags->lists('id')->toArray();
         return view('manage.post.edit', [
-            'item' => $item, 
-            'cats' => $cats, 
-            'tags' => $tags, 
+            'item' => $item,
+            'cats' => $cats,
+            'tags' => $tags,
             'users' => $users,
-            'curr_cats' => $curr_cats,
-            'curr_tags' => $curr_tags
+            'curr_cat_ids' => $curr_cats,
+            'curr_tag_ids' => $curr_tags
         ]);
     }
 

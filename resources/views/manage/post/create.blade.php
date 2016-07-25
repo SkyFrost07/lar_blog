@@ -70,6 +70,28 @@
             <label>{{trans('manage.status')}}</label>
             {!! Form::select('status', [1 => 'Active', 0 => 'Trash'], old('status'), ['class' => 'form-control']) !!}
         </div>
+        
+        <div class="form-group">
+            <label>{{trans('manage.categories')}}</label>
+            <ul class="cat-check-lists">
+                {!! cat_check_lists($cats) !!}
+            </ul>
+        </div>
+        
+        <div class="form-group">
+            <label>{{trans('manage.new_tags')}}</label>
+            <select name="new_tag_ids[]" multiple class="new_tags">
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>{{trans('manage.available_tags')}}</label>
+            <select name="tag_ids[]" multiple class="av_tags">
+                @foreach($tags as $tag)
+                <option value="{{$tag->id}}">{{$tag->pivot->name}}</option>
+                @endforeach
+            </select>
+        </div>
 
         <div class="form-group">
             <label>{{trans('manage.comment_status')}}</label>

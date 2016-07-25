@@ -44,9 +44,9 @@ class FileEloquent extends BaseEloquent {
         return $result;
     }
 
-    public function insert($file) {
+    public function insert($file) { 
         if ($this->validator(['file' => $file])) {
-//            $size = $file->getClientSize();
+            
             $name = $file->getClientOriginalName();
             $mimetype = $file->getClientMimeType();
             $extension = $file->getClientOriginalExtension();
