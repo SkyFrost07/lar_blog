@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 use App\Eloquents\TagEloquent;
 

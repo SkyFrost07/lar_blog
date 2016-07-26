@@ -13,18 +13,17 @@ class TagEloquent extends BaseEloquent {
         $this->model = $model;
     }
 
-    public function rules($update) {
-        $code = current_locale();
-        if (!$update) {
-            return [
-                $code . '.name' => 'required'
-            ];
-        } else {
+    public function rules($update = false) {
+        if ($update) {
             return [
                 'locale.name' => 'required',
                 'lang' => 'required'
             ];
         }
+        $code = current_locale();
+        return [
+            $code . '.name' => 'required'
+        ];
     }
 
     public function all($args = []) {
@@ -70,15 +69,16 @@ class TagEloquent extends BaseEloquent {
 
             $item->langs()->attach($lang->id, $lang_data);
         }
+        return $item;
     }
-    
+
     public function findByLang($id, $fields = ['taxs.*', 'td.*'], $lang = null) {
         $item = $this->model->joinLang($lang)
                 ->find($id, $fields);
         return $item;
     }
 
-    public function update($id, $data) {     
+    public function update($id, $data) {
         $this->validator($data, $this->rules(true));
 
         $fillable = $this->model->getFillable();

@@ -50,7 +50,7 @@
                 <th>{{trans('manage.order')}} {!! link_order('order') !!}</th>
                 <th>{{trans('manage.status')}} {!! link_order('status') !!}</th>
                 <th>{{trans('manage.default')}}</th>
-                <th width="135">{{trans('manage.actions')}}</th>
+                <th width="93">{{trans('manage.actions')}}</th>
             </tr>
         </thead>
         <tbody>

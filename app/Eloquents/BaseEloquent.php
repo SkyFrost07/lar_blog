@@ -27,23 +27,23 @@ abstract class BaseEloquent {
     public function getError() {
         return $this->error;
     }
-    
-    public function getLangs($fields=['id', 'code', 'name']){
+
+    public function getLangs($fields = ['id', 'code', 'name']) {
         return $this->lang->all($fields);
     }
 
     public function find($id) {
         return $this->model->find($id);
     }
-    
-    public function get_author_id($id, $author_field='author_id'){
+
+    public function get_author_id($id, $author_field = 'author_id') {
         $item = $this->model->find($id, [$author_field]);
-        if($item){
+        if ($item) {
             return $item->$author_field;
         }
         return 0;
     }
-    
+
     public function insert($data) {
         if ($this->validator($data, $this->rules())) {
             $item = new $this->model();
@@ -52,12 +52,17 @@ abstract class BaseEloquent {
     }
 
     public function update($id, $data) {
-        if ($this->validator($data, $this->rules($id))) {
-            $fillable = $this->model->getFillable(); 
-            $data = array_only($data, $fillable);
-            return $this->model->where('id', $id)->update($data);
+        $this->validator($data, $this->rules($id));
+        
+        if(isset($data['time'])){
+            $time = $data['time'];
+            $date = date('Y-m-d', strtotime($time['year'].'-'.$time['month'].'-'.$time['day']));
+            $data['created_at'] = $date;
         }
-     }
+        $fillable = $this->model->getFillable();
+        $data = array_only($data, $fillable);
+        return $this->model->where('id', $id)->update($data);
+    }
 
     public function changeStatus($ids, $status) {
         if (is_array($ids)) {

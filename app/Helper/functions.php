@@ -142,11 +142,41 @@ function list_menu_types() {
     ];
 }
 
-function makeRandDir($length=16, $model){
+function makeRandDir($length = 16, $model) {
     $dir = str_random($length);
     $item = $model->where('rand_dir', $dir)->first();
-    if($item){
+    if ($item) {
         $dir = makeRandDir($length, $model);
     }
     return $dir;
+}
+
+function trim_words($text, $limit = 50, $more = ' ...') {
+    $length = strlen($text);
+    if ($length > $limit) {
+        $text = substr($text, $limit, $length-1).$more;
+    }
+    return $text;
+}
+
+function range_options($min, $max, $selected=0){
+    $html = '';
+    for($i = $min; $i<=$max; $i++){
+        $select = ($i == $selected) ? 'selected' : '';
+        $html .= '<option value="'.$i.'" '.$select.'>'.$i.'</option>';
+    }
+    return $html;
+}
+
+function cat_check_lists($items, $checked=[], $parent=0, $depth=0){
+    $html = '';
+    $intent = str_repeat("--- ", $depth);
+    foreach ($items as $item){
+        if($item->parent_id == $parent){
+            $check = in_array($item->id, $checked) ? 'checked' : '';
+            $html .= '<li>'.$intent.'<label><input type="checkbox" name="cat_ids[]" '.$check.' value="'.$item->id.'"> '.$item->name.'</label></li>';
+            $html .= cat_check_lists($items, $checked, $item->id, $depth+1);
+        }
+    }
+    return $html;
 }

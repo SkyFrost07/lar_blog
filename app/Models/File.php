@@ -9,7 +9,7 @@ class File extends Model
 {
     protected $table = 'files';
     
-    protected $fillable = ['name', 'url', 'type', 'mimetype', 'rand_dir', 'author_id'];
+    protected $fillable = ['name', 'url', 'type', 'mimetype', 'rand_dir', 'author_id', 'created_at', 'updated_at'];
     
     public function author(){
         return $this->belongsTo('\App\User', 'author_id', 'id');

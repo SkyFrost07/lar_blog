@@ -3,6 +3,7 @@
 return [
     'cats' => 'Danh mục',
     'caps' => 'Quyền hạn',
+    'files' => 'Tệp tin',
     'menucats' => 'Danh mục menu',
     'posts' => 'Bài viết',
     'roles' => 'Vai trò',

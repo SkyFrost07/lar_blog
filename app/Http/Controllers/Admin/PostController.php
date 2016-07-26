@@ -34,17 +34,28 @@ class PostController extends Controller {
     public function create() {
         canAccess('publish_posts');
 
-        $cats = $this->cat->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => -1, 'fields' => ['id', 'parent_id']]);
-        $tags = $this->tag->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => -1, 'fields' => ['id']]);
+        $cats = $this->cat->all([
+            'orderby' => 'name',
+            'order' => 'asc',
+            'per_page' => -1,
+            'fields' => ['taxs.id', 'taxs.parent_id', 'td.name']]
+        );
+        $tags = $this->tag->all([
+            'orderby' => 'name',
+            'order' => 'asc',
+            'per_page' => -1,
+            'fields' => ['taxs.id', 'td.name']]
+        );
         $users = null;
         if (cando('manage_posts')) {
-            $users = $this->user->all(['orderby' => 'name', 'order' => 'asc', 'pre_page' => -1, 'fields' => ['id', 'name']]);
+            $users = $this->user->all([
+                'orderby' => 'name',
+                'order' => 'asc',
+                'pre_page' => -1,
+                'fields' => ['id', 'name']]
+            );
         }
-        return view('manage.post.create', [
-            'cats' => $cats,
-            'tags' => $tags,
-            'users' => $users
-        ]);
+        return view('manage.post.create', compact('cats', 'tags', 'users'));
     }
 
     public function store(Request $request) {
@@ -64,17 +75,17 @@ class PostController extends Controller {
         canAccess('edit_my_post', $this->post->get_author_id($id));
 
         $cats = $this->cat->all([
-            'orderby' => 'name', 
-            'order' => 'asc', 
-            'per_page' => -1, 
-            'fields' => ['id', 'parent_id']
-            ]);
+            'orderby' => 'name',
+            'order' => 'asc',
+            'per_page' => -1,
+            'fields' => ['taxs.id', 'taxs.parent_id', 'td.name']
+        ]);
         $tags = $this->tag->all([
-                    'orderby' => 'name',
-                    'order' => 'asc',
-                    'per_page' => -1,
-                    'fields' => ['id']
-                ]);
+            'orderby' => 'name',
+            'order' => 'asc',
+            'per_page' => -1,
+            'fields' => ['taxs.id', 'td.name']
+        ]);
         $users = null;
         if (cando('manage_posts')) {
             $users = $this->user->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => 20, 'fields' => ['name', 'id']]);
@@ -82,14 +93,7 @@ class PostController extends Controller {
         $item = $this->post->find($id);
         $curr_cats = $item->cats->lists('id')->toArray();
         $curr_tags = $item->tags->lists('id')->toArray();
-        return view('manage.post.edit', [
-            'item' => $item,
-            'cats' => $cats,
-            'tags' => $tags,
-            'users' => $users,
-            'curr_cat_ids' => $curr_cats,
-            'curr_tag_ids' => $curr_tags
-        ]);
+        return view('manage.post.edit', compact('item', 'cats', 'tags', 'users', 'curr_cats', 'curr_tags'));
     }
 
     public function update($id, Request $request) {

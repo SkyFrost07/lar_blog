@@ -22,6 +22,15 @@ class Cat extends Model {
         return $this->belongsToMany('\App\Models\Lang', 'tax_desc', 'tax_id', 'lang_id')
                         ->where('type', 'cat');
     }
+    
+    public function getName($lang=null){
+        $item = $this->joinLang($lang)
+                ->find($this->id, ['td.name']);
+        if($item){
+            return $item->name;
+        }
+        return null;
+    }
 
     public function parent_name() {
         $item = $this->joinLang()

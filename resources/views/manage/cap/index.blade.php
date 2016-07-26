@@ -38,7 +38,7 @@
                 <th>{{trans('manage.name')}} {!! link_order('name') !!}</th>
                 <th>{{trans('manage.description')}}</th>
                 <th>{{trans('manage.higher')}}</th>
-                <th width="135">{{trans('manage.actions')}}</th>
+                <th width="93">{{trans('manage.actions')}}</th>
             </tr>
         </thead>
         <tbody>

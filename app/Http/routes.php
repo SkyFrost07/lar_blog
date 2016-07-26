@@ -56,6 +56,9 @@ Route::group(['prefix' => $manage, 'middleware' => 'auth', 'namespace' => 'Admin
 //    Page
     Route::resource('pages', 'PageController', rsNames('page'));
     Route::post('/pages/multi-actions', ['as' => 'page.m_action', 'uses' => 'PageController@multiAction']);
+//    Files
+    Route::resource('files', 'FileController', rsNames('file'));
+    Route::post('/files/multi-actions', ['as' => 'file.m_action', 'uses' => 'FileController@multiAction']);
 });
 
 //});

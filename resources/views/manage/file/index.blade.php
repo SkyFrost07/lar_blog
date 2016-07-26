@@ -35,14 +35,14 @@
             <tr>
                 <th width="30"><input type="checkbox" name="massdel" class="checkall"/></th>
                 <th>ID {!! link_order('id') !!}</th>
+                <th width="80">{{trans('manage.thumbnail')}}</th>
                 <th>{{trans('manage.name')}} {!! link_order('name') !!}</th>
                 <th>{{trans('manage.url')}}</th>
                 <th>{{trans('manage.type')}}</th>
                 <th>{{trans('manage.mimetype')}}</th>
                 <th>{{trans('manage.author')}} {!! link_order('author_id') !!}</th>
-                <th>{{trans('manage.created_at')}}</th>
-                <th>{{trans('manage.updated_at')}}</th>
-                <th width="135">{{trans('manage.actions')}}</th>
+                <th>{{trans('manage.created_at')}} {!! link_order('created_at') !!}</th>
+                <th width="93">{{trans('manage.actions')}}</th>
             </tr>
         </thead>
         <tbody>
@@ -50,13 +50,13 @@
             <tr>
                 <td><input type="checkbox" name="checked[]" class="checkitem" value="{{ $item->id }}" /></td>
                 <td>{{ $item->id }}</td>
+                <td>{!! $item->getImage('thumbnail') !!}</td>
                 <td>{{ $item->name }}</td>
-                <td>{{ $item->url }}</td>
+                <td>{{ $item->rand_dir }}</td>
                 <td>{{ $item->type }}</td>
                 <td>{{ $item->mimetype }}</td>
                 <td>{{ $item->author->name }}</td>
                 <td>{{ $item->created_at }}</td>
-                <td>{{ $item->updated_at }}</td>
                 <td>
                     @if(cando('edit_my_file', $item->author_id))
                     <a href="{{route('file.edit', ['id' => $item->id])}}" class="btn btn-sm btn-info" title="{{trans('manage.edit')}}"><i class="fa fa-edit"></i></a>

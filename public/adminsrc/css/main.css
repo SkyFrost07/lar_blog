@@ -22,4 +22,20 @@ a:hover {
 .lang_tabs li a:hover {
   border-bottom: 2px solid tomato;
 }
+.time_group .t_field {
+  display: inline-block;
+  margin-right: 10px;
+}
+.time_group .form-control {
+  display: inline-block;
+  width: auto;
+}
+.cat-check-lists {
+  list-style: none;
+  max-height: 230px;
+  overflow: auto;
+  padding-left: 0;
+  background: #f5f5f5;
+  padding: 10px;
+}
 /*# sourceMappingURL=main.css.map */

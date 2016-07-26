@@ -50,7 +50,8 @@
                 <th>{{trans('manage.comment_count')}} {!! link_order('comment_count') !!}</th>
                 <th>{{trans('manage.status')}} {!! link_order('status') !!}</th>
                 <th>{{trans('manage.views')}} {!! link_order('views') !!}</th>
-                <th width="135">{{trans('manage.actions')}}</th>
+                <th>{{trans('manage.created_at')}} {!! link_order('created_at') !!}</th>
+                <th width="93">{{trans('manage.actions')}}</th>
             </tr>
         </thead>
         <tbody>
@@ -58,19 +59,19 @@
             <tr>
                 <td><input type="checkbox" name="checked[]" class="checkitem" value="{{ $item->id }}" /></td>
                 <td>{{$item->id}}</td>
-                <td>{{$item->pivot->title}}</td>
-                <td>{{$item->pivot->slug}}</td>
+                <td>{{$item->title}}</td>
+                <td>{{$item->slug}}</td>
                 <td>
                     @if($item->cats)
                     @foreach($item->cats as $cat)
-                    <p><i class="fa fa-check"></i> <a href="#">{{$cat->current_locale()->name}}</a></p>
+                    <div><i class="fa fa-check"></i> {{$cat->getName()}}<a href="#"></a></div>
                     @endforeach
                     @endif
                 </td>
                 <td>
                     @if($item->tags)
                     @foreach($item->tags as $tag)
-                    -- <a href="#">{{$tag->current_locale()->name}} </a>
+                    <div style="white-space: nowrap;"><i>-- </i><a href="#">{{$tag->getName()}}</a></div>
                     @endforeach
                     @endif
                 </td>
@@ -78,6 +79,7 @@
                 <td>{{$item->comment_count}}</td>
                 <td>{{$item->str_status()}}</td>
                 <td>{{$item->views}}</td>
+                <td>{{$item->created_at}}</td>
                 <td>
                     @if(cando('edit_my_post', $item->author_id))
                     <a href="{{route('post.edit', ['id' => $item->id])}}" class="btn btn-sm btn-info" title="{{trans('manage.edit')}}"><i class="fa fa-edit"></i></a>

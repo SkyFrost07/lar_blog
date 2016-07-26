@@ -59,7 +59,7 @@
                 <th>{{trans('manage.password')}}</th>
                 <th>{{trans('manage.role')}} {!! link_order('role_id') !!}</th>
                 <th>{{trans('manage.status')}} {!! link_order('status') !!}</th>
-                <th width="135">{{trans('manage.actions')}}</th>
+                <th width="93">{{trans('manage.actions')}}</th>
             </tr>
         </thead>
         <tbody>
