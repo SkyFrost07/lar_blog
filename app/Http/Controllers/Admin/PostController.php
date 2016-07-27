@@ -90,7 +90,7 @@ class PostController extends Controller {
         if (cando('manage_posts')) {
             $users = $this->user->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => 20, 'fields' => ['name', 'id']]);
         }
-        $item = $this->post->find($id);
+        $item = $this->post->findByLang($id);
         $curr_cats = $item->cats->lists('id')->toArray();
         $curr_tags = $item->tags->lists('id')->toArray();
         return view('manage.post.edit', compact('item', 'cats', 'tags', 'users', 'curr_cats', 'curr_tags'));

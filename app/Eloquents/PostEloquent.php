@@ -14,10 +14,16 @@ class PostEloquent extends BaseEloquent {
         $this->tag = $tag;
     }
 
-    public function rules() {
-        $code = current_locale();
+    public function rules($update = false) {
+        if (!$update) {
+            $code = current_locale();
+            return [
+                $code . '.title' => 'required'
+            ];
+        }
         return [
-            $code . '.title' => 'required'
+            'locale.title' => 'required',
+            'lang' => 'required'
         ];
     }
 
@@ -42,7 +48,7 @@ class PostEloquent extends BaseEloquent {
                 ->where('pd.title', 'like', '%' . $opts['key'] . '%')
                 ->whereNotIn('posts.id', $opts['exclude'])
                 ->select($opts['fields'])
-                ->orderby($opts['orderby'], $opts['order']);
+                ->orderBy($opts['orderby'], $opts['order']);
 
         if ($opts['with_cats']) {
             $result = $result->with('cats');
@@ -63,9 +69,9 @@ class PostEloquent extends BaseEloquent {
         $this->validator($data, $this->rules());
 
         $data['author_id'] = auth()->id();
-        if(isset($data['time'])){
+        if (isset($data['time'])) {
             $time = $data['time'];
-            $data['created_at'] = date('Y-m-d H:i:s', strtotime($time['year'].'-'.$time['month'].'-'.$time['day'].' '.date('H:i:s')));
+            $data['created_at'] = date('Y-m-d H:i:s', strtotime($time['year'] . '-' . $time['month'] . '-' . $time['day'] . ' ' . date('H:i:s')));
         }
         $item = $this->model->create($data);
 
@@ -78,9 +84,9 @@ class PostEloquent extends BaseEloquent {
         if (isset($data['new_tags'])) {
             foreach ($data['new_tags'] as $tag) {
                 $newtag = $this->tag->create(['type' => 'tag']);
-                foreach ($langs as $lang){
+                foreach ($langs as $lang) {
                     $tag_desc = [];
-                    if($lang->code == current_locale()){
+                    if ($lang->code == current_locale()) {
                         $tag_desc = [
                             'name' => $tag,
                             'slug' => str_slug($tag)
@@ -108,33 +114,57 @@ class PostEloquent extends BaseEloquent {
 
         return $item;
     }
+    
+    public function findByLang($id, $fields = ['posts.*', 'pd.*'], $lang = null) {
+        $item = $this->model->joinLang($lang)
+                ->find($id, $fields);
+        return $item;
+    }
 
     public function update($id, $data) {
-        if ($this->validator($data)) {
-            $fillable = $this->model->getFillable();
-            $fill_data = array_only($data, $fillable);
-            $item = $this->model->find($id);
-            $item->update($fill_data);
+        $this->validator($data, $this->rules());
 
-            if (isset($data['cat_ids'])) {
-                $item->cats()->detach($item->cats()->lists('id')->toArray());
-                $item->cats()->attach($data['cat_ids']);
-            }
+        $fillable = $this->model->getFillable();
+        $fill_data = array_only($data, $fillable);
+        $item = $this->model->find($id);
+        $item->update($fill_data);
 
-            if (isset($data['tag_ids'])) {
-                $item->tags()->detach($item->tags()->lists('id')->toArray());
-                $item->tags()->attach($data['tag_ids']);
-            }
+        if (isset($data['cat_ids'])) {
+            $item->cats()->detach($item->cats()->lists('id')->toArray());
+            $item->cats()->attach($data['cat_ids']);
+        }
 
-            foreach (get_langs() as $lang) {
-                $lang_data = $data[$lang->code];
-                $name = $lang_data['title'];
-                $slug = $lang_data['slug'];
-                $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
+        if (isset($data['tag_ids'])) {
+            $item->tags()->detach($item->tags()->lists('id')->toArray());
+            $item->tags()->attach($data['tag_ids']);
+        }
 
-                $lang->posts()->sync([$id => $lang_data], false);
+        $langs = get_langs(['fields' => ['id', 'code']]);
+        if (isset($data['new_tags'])) {
+            foreach ($data['new_tags'] as $tag) {
+                $newtag = $this->tag->create(['type' => 'tag']);
+                foreach ($langs as $lang) {
+                    $tag_desc = [];
+                    if ($lang->code == current_locale()) {
+                        $tag_desc = [
+                            'name' => $tag,
+                            'slug' => str_slug($tag)
+                        ];
+                    }
+                    $newtag->langs()->attach($lang->id, $tag_desc);
+                }
+                $item->tags()->attach($newtag->id);
             }
         }
+
+        $lang_id = get_lang_id($data['lang']);
+        
+        $lang_data = $data['locale'];
+        $name = $lang_data['title'];
+        $slug = $lang_data['slug'];
+        $lang_data['slug'] = (trim($slug) == '') ? str_slug($name) : str_slug($slug);
+
+        $item->langs()->sync([$lang_id => $lang_data], false);
     }
 
     public function destroy($ids) {

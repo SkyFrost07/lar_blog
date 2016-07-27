@@ -83,34 +83,6 @@
         </div>
 
         <div class="form-group">
-            <label>{{trans('manage.categories')}}</label>
-            <ul class="cat-check-lists">
-                {!! cat_check_lists($cats, old('cat_ids') ? old('cat_ids') : []) !!}
-            </ul>
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.new_tags')}}</label>
-            <select name="new_tags[]" multiple class="new_tags form-control">
-                @if(old('new_tags'))
-                @foreach(old('new_tags') as $tag)
-                <option selected value="{{$tag}}">{{$tag}}</option>
-                @endforeach
-                @endif
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.available_tags')}}</label>
-            <select name="tag_ids[]" multiple class="av_tags form-control">
-                <?php $old_tag_ids = old('tag_ids') ? old('tag_ids') : []; ?>
-                @foreach($tags as $tag)
-                <option value="{{$tag->id}}" {{ in_array($tag->id, $old_tag_ids) ? 'selected' : '' }}>{{$tag->name}}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="form-group">
             <label>{{trans('manage.comment_status')}}</label>
             {!! Form::select('status', [1 => 'Open', 0 => 'Close'], old('comment_status'), ['class' => 'form-control']) !!}
         </div>

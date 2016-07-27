@@ -22,6 +22,9 @@ class FileController extends Controller {
 
     public function index(Request $request) {
         $files = $this->file->all($request->all());
+        if($request->wantsJson() || $request->ajax()){
+            return response()->json($files);
+        }
         return view('manage.file.index', ['items' => $files]);
     }
 

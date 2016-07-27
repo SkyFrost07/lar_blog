@@ -35,7 +35,8 @@ class Post extends Model {
     }
 
     public function langs() {
-        return $this->belongsToMany('\App\Models\Lang', 'post_desc', 'post_id', 'lang_id');
+        return $this->belongsToMany('\App\Models\Lang', 'post_desc', 'post_id', 'lang_id')
+                ->where('post_type', 'post');
     }
 
     public function getCats($locale = null) {
