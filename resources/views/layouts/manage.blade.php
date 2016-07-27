@@ -20,7 +20,7 @@ and open the template in the editor.
         </script>
         @yield('head')
     </head>
-    <body>
+    <body @yield('ngApp', '')>
         <header>
             <nav class="navbar navbar-default">
                 <div class="container-fluid">

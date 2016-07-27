@@ -27,6 +27,7 @@ class FileEloquent extends BaseEloquent {
             'order' => 'desc',
             'per_page' => 20,
             'key' => '',
+            'author' => -1,
             'page' => 1
         ];
 
@@ -36,12 +37,25 @@ class FileEloquent extends BaseEloquent {
                 ->where('name', 'like', '%' . $opts['key'] . '%')
                 ->select($opts['fields'])
                 ->orderBy($opts['orderby'], $opts['order']);
+        
+        if($opts['author'] > -1){
+            $result = $result->where('author_id', $opts['author']);
+        }
+        
         if ($opts['per_page'] == -1) {
             $result = $result->get();
         } else {
             $result = $result->paginate($opts['per_page']);
         }
         return $result;
+    }
+    
+    public function getImage($id, $size='thumbnail'){
+        $item = $this->model->find($id);
+        if($item){
+            return $item->getImage($size);
+        }
+        return null;
     }
 
     public function insert($file) {
@@ -113,8 +127,9 @@ class FileEloquent extends BaseEloquent {
         $item->mimetype = $mimetype;
         $item->rand_dir = $rand_dir;
         $item->author_id = 1;
-
-        return $item->save();
+        $item->save();
+        
+        return $item;
     }
 
     public function destroy($ids) {

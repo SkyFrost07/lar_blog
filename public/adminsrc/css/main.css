@@ -38,4 +38,38 @@ a:hover {
   background: #f5f5f5;
   padding: 10px;
 }
+.files_list .file {
+  display: inline-block;
+  margin: 5px;
+}
+.files_list .checked {
+  border: 2px solid #009933;
+  position: relative;
+}
+.files_list .checked:after {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  content: "\f00c";
+  display: block;
+  font-family: FontAwesome;
+  font-size: 14px;
+  padding: 3px 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  color: #009933;
+}
+.thumb_item {
+  margin: 10px 0;
+  position: relative;
+}
+.thumb_item .close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ffffff;
+  padding: 5px 7px;
+  opacity: 0.8;
+  border-radius: 50%;
+}
 /*# sourceMappingURL=main.css.map */

@@ -73,6 +73,7 @@ return [
     'unit' => 'Đơn vị tiền tệ',
     'ratio_currency' => 'Tỉ lệ tiền tệ',
 //    Posts
+    'add_image' => 'Thêm ảnh',
     'available_tags' => 'Thẻ có sẵn',
     'author' => 'Tác giả',
     'category' => 'Danh mục',

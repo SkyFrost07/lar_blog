@@ -27,6 +27,14 @@ class FileController extends Controller {
         }
         return view('manage.file.index', ['items' => $files]);
     }
+    
+    public function show($id, Request $request){
+        $size = 'thumbnail';
+        if($request->has('size')){
+            $size = $request->get('size');
+        }
+        return $this->file->getImage($id, $size);
+    }
 
     public function create() {
         return view('manage.file.create');
@@ -43,7 +51,7 @@ class FileController extends Controller {
         foreach ($files as $file) {
             try {
                 $newfile = $this->file->insert($file);
-                $results[] = $newfile;
+                array_push($results, $newfile);
             } catch (ValidationException $ex) {
                 return redirect()->back()->withInput()->withErrors($ex->validator);
             }

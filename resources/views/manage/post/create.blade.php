@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="/adminsrc/css/select2.min.css">
 @stop
 
+@section('ngApp', 'ng-app="ngFile"')
+
 @section('content')
 
 {!! show_messes() !!}
@@ -65,16 +67,16 @@
 
     <div class="col-sm-4">
         
-        <div class="form-group thumb_box" ng-app="ngFile" ng-controller="FileCtrl">
+        <div class="form-group thumb_box" ng-controller="selectFileCtrl">
             <label>{{trans('manage.thumbnail')}}</label>
-            <div class="thumb_group" ng-if="checked_files.length > 0">
-                <div class="thumb_item" ng-repeat="file in checked_files">
-                    <img src="{% file.url %}" class="img-responsive">
-                    <input type="hidden" name="image_id" value="{% file.id %}">
+            <div class="thumb_group" ng-if="submit_files.length > 0">
+                <div class="thumb_item" ng-repeat="file in submit_files">
+                    <a ng-thumb="full" file-id="{% file.id %}"></a>
+                    <input type="hidden" name="thumb_id" value="{% file.id %}">
                     <button type="button" ng-click="removeFile(file)" class="close"><i class="fa fa-close"></i></button>
                 </div>
             </div>
-            <button type="button" ng-click="loadFiles()" class="btn btn-default" data-toggle="modal" data-target="files_modal">{{trans('manage.add_image')}}</button>
+            <div><button type="button" ng-click="loadFiles(false)" class="btn btn-default" data-toggle="modal" data-target="#files_modal">{{trans('manage.add_image')}}</button></div>
         </div>
 
         <div class="form-group">
@@ -159,8 +161,8 @@
 @stop
 
 @section('foot')
+
 <script src="/adminsrc/js/select2.min.js"></script>
-<script src="/plugins/angular/angular.min.js"></script>
 <script>
     (function ($) {
         $('.new_tags').select2({
@@ -169,5 +171,8 @@
         $('.av_tags').select2();
     })(jQuery);
 </script>
+
+@include('files.modal')
+
 @stop
 
