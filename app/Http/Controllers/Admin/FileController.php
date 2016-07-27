@@ -35,13 +35,18 @@ class FileController extends Controller {
         }
 
         $files = $request->file('files');
+        $results = [];
 
         foreach ($files as $file) {
             try {
-                $this->file->insert($file);
+                $newfile = $this->file->insert($file);
+                $results[] = $newfile;
             } catch (ValidationException $ex) {
                 return redirect()->back()->withInput()->withErrors($ex->validator);
             }
+        }
+        if($request->wantsJson() || $request->ajax()){
+            return response()->json($results);
         }
         return redirect()->back()->with('succ_mess', trans('manage.store_success'));
     }

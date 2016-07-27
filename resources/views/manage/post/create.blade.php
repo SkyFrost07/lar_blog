@@ -64,6 +64,18 @@
     </div>
 
     <div class="col-sm-4">
+        
+        <div class="form-group thumb_box" ng-app="ngFile" ng-controller="FileCtrl">
+            <label>{{trans('manage.thumbnail')}}</label>
+            <div class="thumb_group" ng-if="checked_files.length > 0">
+                <div class="thumb_item" ng-repeat="file in checked_files">
+                    <img src="{% file.url %}" class="img-responsive">
+                    <input type="hidden" name="image_id" value="{% file.id %}">
+                    <button type="button" ng-click="removeFile(file)" class="close"><i class="fa fa-close"></i></button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="files_modal">{{trans('manage.add_image')}}</button>
+        </div>
 
         <div class="form-group">
             <label>{{trans('manage.status')}}</label>
@@ -131,26 +143,6 @@
                     </select>
                 </div>
             </div>
-<!--            <div class="time_group">
-                <div class="t_field">
-                    <span>{{trans('manage.hour')}}</span>
-                    <select name="time[hour]">
-                        {!! range_options(0, 24, date('H')) !!}
-                    </select>
-                </div>
-                <div class="t_field">
-                    <span>{{trans('manage.minute')}}</span>
-                    <select name="time[minute]">
-                        {!! range_options(0, 60, date('i')) !!}
-                    </select>
-                </div>
-                <div class="t_field">
-                    <span>{{trans('manage.second')}}</span>
-                    <select name="time[second]">
-                        {!! range_options(0, 60, date('s')) !!}
-                    </select>
-                </div>
-            </div>-->
         </div>
         @endif
 
@@ -168,6 +160,7 @@
 
 @section('foot')
 <script src="/adminsrc/js/select2.min.js"></script>
+<script src="/plugins/angular/angular.min.js"></script>
 <script>
 (function ($) {
     $('.new_tags').select2({

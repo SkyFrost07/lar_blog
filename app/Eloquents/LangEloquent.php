@@ -61,7 +61,7 @@ class LangEloquent extends BaseEloquent {
     }
 
     function findByName($name, $fields = ['*']) {
-        return $this->model->where('name', $name)->select($fields)->first();
+        return $this->model->where('name', $name)->first($fields);
     }
     
     public function findByCode($code, $fields=['*']){
