@@ -47,7 +47,7 @@
                 <td><input type="checkbox" name="checked[]" class="checkitem" value="{{ $item->id }}" /></td>
                 <td>{{$item->id}}</td>
                 <td>{{$item->name}}</td>
-                <td><a href="#" class="btn btn-sm btn-primary"><i class="fa fa-long-arrow-right"></i></a></td>
+                <td><a href="{{route('menucat.edit', ['id' => $item->id])}}" class="btn btn-sm btn-primary"><i class="fa fa-long-arrow-right"></i></a></td>
                 <td>{{$item->slug}}</td>
                 <td>
                     <a href="{{route('menucat.edit', ['id' => $item->id])}}" class="btn btn-sm btn-info" title="{{trans('manage.edit')}}"><i class="fa fa-edit"></i></a>

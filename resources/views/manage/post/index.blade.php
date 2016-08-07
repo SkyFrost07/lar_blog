@@ -11,9 +11,11 @@
 
 @section('actions')
 
-@if(cando('manage_posts'))
+@if(cando('publish_posts'))
 <a href="{{route('post.create')}}" class="btn btn-sm btn-success navbar-btn"><i class="fa fa-plus"></i> {{trans('manage.create')}}</a>
+@endif
 
+@if(cando('manage_posts'))
 {!! Form::open(['method' => 'post', 'route' => 'post.m_action', 'class' => 'form-inline action-form', 'title' => trans('manage.restore')]) !!}
 {!! Form::hidden('action', 'restore') !!}
 <button type="submit" class="btn btn-sm btn-info navbar-btn"><i class="fa fa-mail-forward"></i> {{trans('manage.restore')}}</button>
@@ -35,7 +37,7 @@
 
 {!! show_messes() !!}
 
-@if(!$items->isEmpty())
+@if(!$items->isEmpty()) 
 <div class="table-responsive">
     <table class="table table-hover table-striped">
         <thead>
@@ -44,8 +46,8 @@
                 <th>ID {!! link_order('id') !!}</th>
                 <th>{{trans('manage.name')}} {!! link_order('pt.name') !!}</th>
                 <th>{{trans('manage.slug')}}</th>
-                <th>{{trans('manage.category')}} </th>
-                <th>{{trans('manage.tag')}} </th>
+<!--                <th>{{trans('manage.category')}} </th>
+                <th>{{trans('manage.tag')}} </th>-->
                 <th>{{trans('manage.author')}} {!! link_order('author_id') !!}</th>
                 <th>{{trans('manage.comment_count')}} {!! link_order('comment_count') !!}</th>
                 <th>{{trans('manage.status')}} {!! link_order('status') !!}</th>
@@ -61,7 +63,7 @@
                 <td>{{$item->id}}</td>
                 <td>{{$item->title}}</td>
                 <td>{{$item->slug}}</td>
-                <td>
+<!--                <td>
                     @if($item->cats)
                     @foreach($item->cats as $cat)
                     <div><i class="fa fa-check"></i> {{$cat->getName()}}<a href="#"></a></div>
@@ -74,7 +76,7 @@
                     <div style="white-space: nowrap;"><i>-- </i><a href="#">{{$tag->getName()}}</a></div>
                     @endforeach
                     @endif
-                </td>
+                </td>-->
                 <td>{{$item->author ? $item->author->name : 'N/A'}}</td>
                 <td>{{$item->comment_count}}</td>
                 <td>{{$item->str_status()}}</td>

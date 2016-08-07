@@ -4,58 +4,84 @@ angular.module('ngFile', [])
             $interpolateProvider.endSymbol('%}');
         })
         .controller('FileCtrl', function ($scope, $rootScope, $http) {
+            $rootScope.files = [];
+            $scope.loadFiles = function (multi_check) {
+                if ($rootScope.files.length === 0) {
+                    $rootScope.multi_check = multi_check;
+                    $http.get(files_url, {
+                        params: {'fields[]': ['id', 'rand_dir', 'url']}
+                    }).then(function (response) {
+                        $rootScope.files = response.data.data;
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                }
+            };
+
             $scope.checked_files = [];
+
+            $scope.inCheckedFiles = function (item) {
+                for (var i in $scope.checked_files) {
+                    if ($scope.checked_files[i].id == item.id) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            $scope.findFileIndex = function (file) {
+                for (var i in $scope.checked_files) {
+                    if ($scope.checked_files[i].id == file.id) {
+                        return i;
+                    }
+                }
+                return -1;
+            };
+
             $scope.checkFile = function (file, multi) {
                 $scope.proccessing = false;
                 if (typeof multi == "undefined") {
                     multi = false;
                 }
 
-                var index = $scope.checked_files.indexOf(file);
+                var index = $scope.findFileIndex(file);
                 if (index > -1) {
                     $scope.checked_files.splice(index, 1);
                 } else {
-                    if(multi){
+                    if (multi) {
                         $scope.checked_files.push(file);
-                    }else{
+                    } else {
                         $scope.checked_files = [];
                         $scope.checked_files[0] = file;
                     }
                 }
             };
-            $rootScope.submit_files = [];
+
             $scope.submitChecked = function () {
-                $rootScope.submit_files = $scope.checked_files;
+                $scope.submit_files = $scope.checked_files;
                 var modal = jQuery('#files_modal');
                 modal.modal('hide');
             };
-        })
-        .controller('selectFileCtrl', function ($scope, $rootScope, $http) {
-            $scope.loadFiles = function (multi_check) {
-                $rootScope.multi_check = multi_check;
-                $http.get('/' + current_locale + '/manage/files', {
-                    params: {'fields[]': ['id', 'rand_dir', 'url']}
-                }).then(function (response) {
-                    $rootScope.files = response.data.data; 
-                    $scope.$emit('loaded-files', response.data.data);
-                }).catch(function (err) {
-                    console.log(err);
-                });
-            };
-            $scope.removeFile = function(file){
-                var index = $rootScope.submit_files.indexOf(file);
-                $rootScope.submit_files.splice(index, 1);
+
+            $scope.removeFile = function (file) {
+                var index = $scope.submit_files.indexOf(file);
+                $scope.submit_files.splice(index, 1);
             };
         })
-        .directive('ngThumb', function ($http) {
+        .directive('ngThumb', function ($http, $timeout) {
             return {
                 restrict: 'A',
                 link: function (scope, element, attrs) {
                     attrs.$observe("fileId", function (file_id) {
-                        var size = attrs.ngThumb;
-                        $http.get('/' + current_locale + '/manage/files/' + file_id, {params: {size: size}}).then(function (response) {
-                            element.html(response.data);
-                        });
+                        $timeout(function () {
+                            var size = attrs.ngThumb;
+                            $http.get(files_url + '/' + file_id, {
+                                params: {size: size},
+                                headers: {_token: _token}
+                            }).then(function (response) {
+                                element.html(response.data);
+                            });
+                        }, 200);
                     });
                 }
             };
@@ -71,9 +97,10 @@ angular.module('ngFile', [])
                             for (var i = 0; i < files.length; i++) {
                                 formData.append('files[]', files[i]);
                             }
+                            formData.append('_token', _token);
                             $http({
                                 method: 'POST',
-                                url: '/'+current_locale+'/manage/files',
+                                url: '/' + current_locale + '/manage/files',
                                 data: formData,
                                 headers: {'Content-type': undefined}
                             }).success(function (data) {

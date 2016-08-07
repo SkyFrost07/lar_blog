@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Eloquents\PostEloquent;
 use App\Eloquents\CatEloquent;
@@ -71,9 +70,13 @@ class PostController extends Controller {
         }
     }
 
-    public function edit($id) {
+    public function edit($id, Request $request) {
         canAccess('edit_my_post', $this->post->get_author_id($id));
 
+        $lang = current_locale();
+        if ($request->has('lang')) {
+            $lang = $request->get('lang');
+        }
         $cats = $this->cat->all([
             'orderby' => 'name',
             'order' => 'asc',
@@ -88,15 +91,21 @@ class PostController extends Controller {
         ]);
         $users = null;
         if (cando('manage_posts')) {
-            $users = $this->user->all(['orderby' => 'name', 'order' => 'asc', 'per_page' => 20, 'fields' => ['name', 'id']]);
+            $users = $this->user->all([
+                'orderby' => 'name',
+                'order' => 'asc',
+                'per_page' => 20,
+                'fields' => ['name', 'id']
+            ])->lists('name', 'id')->toArray();
         }
-        $item = $this->post->findByLang($id);
+        $item = $this->post->findByLang($id, ['posts.*', 'pd.*'], $lang);
         $curr_cats = $item->cats->lists('id')->toArray();
         $curr_tags = $item->tags->lists('id')->toArray();
-        return view('manage.post.edit', compact('item', 'cats', 'tags', 'users', 'curr_cats', 'curr_tags'));
+        return view('manage.post.edit', compact('item', 'cats', 'tags', 'users', 'curr_cats', 'curr_tags', 'lang'));
     }
 
     public function update($id, Request $request) {
+        canAccess('edit_my_post', $this->post->get_author_id($id));
         try {
             $this->post->update($id, $request->all());
             return redirect()->back()->with('succ_mess', trans('manage.update_success'));
@@ -106,6 +115,8 @@ class PostController extends Controller {
     }
 
     public function destroy($id) {
+        canAccess('remove_my_post', $this->media->get_author_id($id));
+        
         if (!$this->post->changeStatus($id, 0)) {
             return redirect()->back()->with('error_mess', trans('manage.no_item'));
         }
@@ -113,7 +124,7 @@ class PostController extends Controller {
     }
 
     public function multiAction(Request $request) {
-        return $result = $this->post->actions($request);
+        return response()->json($this->post->actions($request));
     }
 
 }

@@ -17,10 +17,10 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->integer('role_id')->references('id')->on('roles')->onDelete('set null');
+            $table->integer('role_id');
             $table->tinyInteger('gender');
             $table->timestamp('birth');
-            $table->integer('image_id', 0)->references('id')->on('files')->onDelete('set default');
+            $table->string('image_id');
             $table->tinyInteger('status')->default(2);
             $table->string('resetPasswdToken');
             $table->bigInteger('resetPasswdExpires');

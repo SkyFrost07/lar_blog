@@ -75,7 +75,10 @@ class TagEloquent extends BaseEloquent {
     public function findByLang($id, $fields = ['taxs.*', 'td.*'], $lang = null) {
         $item = $this->model->joinLang($lang)
                 ->find($id, $fields);
-        return $item;
+        if($item){
+            return $item;
+        }
+        return $this->model->find($id);
     }
 
     public function update($id, $data) {

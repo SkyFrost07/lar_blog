@@ -13,9 +13,12 @@ use DB;
 class AuthController extends Controller
 {
     protected $user;
-    
-    public function __construct(\App\User $user) {
+    protected $role;
+
+
+    public function __construct(\App\User $user, \App\Models\Role $role) {
         $this->user = $user;
+        $this->role = $role;
     }
     
     public function getRegister(){
@@ -147,6 +150,51 @@ class AuthController extends Controller
         $user->save();
         
         return redirect()->route('get_login')->with('succ_mess', trans('auth.reset_pass_success'));
+    }
+    
+    public function getProfile(){
+        $roles = $this->role->all()->lists('label', 'id')->toArray();
+        return view('manage.account.profile', compact('roles'));
+    }
+    
+    public function updateProfile(Request $request){
+        $valid = Validator::make($request->all(), [
+            'name' => 'required'
+        ]);
+        if($valid->fails()){
+            return redirect()->back()->withInput()->withErrors($valid->errors());
+        }
+        $data = $request->all();
+        $birth = $data['birth'];
+        $data['birth'] = date('Y-m-d H:i:s', strtotime($birth['year'].'-'.$birth['month'].'-'.$birth['day']));
+        $data['image_id'] = cutImgPath($data['image_id']);
+        $fillable = $this->user->getFillable();
+        $fill_data = array_only($data, $fillable);
+        $this->user->where('id', auth()->id())->update($fill_data);
+        return redirect()->back()->with('succ_mess', trans('auth.updated_profile'));
+    }
+    
+    public function getChangePass(){
+        return view('manage.account.change_password');
+    }
+    
+    public function updatePassword(Request $request){
+        $valid = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|confirmed'
+        ]);
+        if($valid->fails()){
+            return redirect()->back()->withInput()->withErrors($valid->errors());
+        }
+        $user = auth()->user();
+        $check = \Hash::check($request->input('old_password'), $user->password);
+        if(!$check){
+            return redirect()->back()->withInput()->with('error_mess', trans('auth.invalid_pass'));
+        }
+        if(!$this->user->find($user->id)->update(['password' => bcrypt($request->input('new_password'))])){
+            return redirect()->back()->withInput()->with('error_mess', trans('auth.error_database'));
+        }
+        return redirect()->back()->with('error_mess', trans('auth.updated_pass'));
     }
     
 }

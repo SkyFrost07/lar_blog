@@ -4,18 +4,18 @@
 
 @section('page_title', trans('manage.edit'))
 
-@section('head')
-<link rel="stylesheet" href="/adminsrc/css/select2.min.css">
-@stop
+@section('bodyAttrs', 'ng-app="ngFile" ng-controller="FileCtrl"')
 
 @section('content')
 
 {!! show_messes() !!}
 
+@if($item)
+
 {!! Form::open(['method' => 'put', 'route' => ['post.update', $item->id]]) !!}
 
 <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-9">
 
         @include('manage.parts.lang_edit_tabs', ['route' => 'post.edit'])
 
@@ -49,64 +49,6 @@
             <label>{{trans('manage.meta_desc')}}</label>
             {!! Form::textarea('locale[meta_desc]', $item->meta_desc, ['class' => 'form-control', 'rows' => 2, 'placeholder' => trans('manage.meta_desc')]) !!}
         </div>
-
-    </div>
-    <div class="col-sm-4">
-
-        <div class="form-group thumb_box" ng-app="ngFile" ng-controller="FileCtrl">
-            <label>{{trans('manage.thumbnail')}}</label>
-            <div class="thumb_group" ng-if="checked_files.length > 0">
-                <div class="thumb_item" ng-repeat="file in checked_files">
-                    <img src="{% file.url %}" class="img-responsive">
-                    <input type="hidden" name="image_id" value="{% file.id %}">
-                    <button type="button" ng-click="removeFile(file)" class="close"><i class="fa fa-close"></i></button>
-                </div>
-            </div>
-            <button type="button" ng-click="loadFile()" class="btn btn-default" data-toggle="modal" data-target="files_modal">{{trans('manage.add_image')}}</button>
-        </div>
-        
-        <div class="form-group">
-            <label>{{trans('manage.status')}}</label>
-            {!! Form::select('status', [1 => 'Active', 0 => 'Trash'], $item->status, ['class' => 'form-control']) !!}
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.categories')}}</label>
-            <ul class="cat-check-lists">
-                {!! cat_check_lists($cats, $curr_cats) !!}
-            </ul>
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.new_tags')}}</label>
-            <select name="new_tags[]" multiple class="new_tags form-control">
-                @if(old('new_tags'))
-                @foreach(old('new_tags') as $tag)
-                <option selected value="{{$tag}}">{{$tag}}</option>
-                @endforeach
-                @endif
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.available_tags')}}</label>
-            <select name="tag_ids[]" multiple class="av_tags form-control">
-                <?php $curr_tags = $curr_tags ? $curr_tags : []; ?>
-                @foreach($tags as $tag)
-                <option value="{{$tag->id}}" {{ in_array($tag->id, $curr_tags) ? 'selected' : '' }}>{{$tag->name}}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.comment_status')}}</label>
-            {!! Form::select('status', [1 => 'Open', 0 => 'Close'], $item->comment_status, ['class' => 'form-control']) !!}
-        </div>
-
-        <div class="form-group">
-            <label>{{trans('manage.views')}}</label>
-            {!! Form::number('views', $item->views, ['class' => 'form-control']) !!}
-        </div>
         
         @if(cando('edit_other_posts'))
         <div class="form-group">
@@ -132,7 +74,78 @@
                 </div>
             </div>
         </div>
+        
+        <div class="form-group">
+            <label>{{trans('manage.author')}}</label>
+            {!! Form::select('author_id', $users, $item->author_id, ['class' => 'form-control']) !!}
+        </div>
         @endif
+
+    </div>
+    <div class="col-sm-3">
+
+        <div class="form-group thumb_box" >
+            <label>{{trans('manage.thumbnail')}}</label>
+            <div class="thumb_group">
+                <div class="thumb_item">
+                    <a class="img_box">
+                        @if($item->thumb_id)
+                        <img class="img-responsive" src="{{getImageSrc($item->thumb_id)}}" alt="Thumbnail">
+                        @endif
+                    </a>
+                    <input type="hidden" id="file_url" name="thumb_id" value="{{getImageSrc($item->thumb_id)}}">
+                    <div class="btn_box">
+                        @if($item->thumb_id)
+                        <button type="button" class="close btn-remove-file"><i class="fa fa-close"></i></button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div><button type="button" class="btn btn-default btn-popup-files" frame-url="/plugins/filemanager/dialog.php?type=1&field_id=file_url&field_img=file_src" data-toggle="modal" data-target="#files_modal">{{trans('manage.add_image')}}</button></div>
+        </div>
+        
+        <div class="form-group">
+            <label>{{trans('manage.status')}}</label>
+            {!! Form::select('status', [1 => 'Active', 0 => 'Trash'], $item->status, ['class' => 'form-control']) !!}
+        </div>
+
+        <div class="form-group">
+            <label>{{trans('manage.categories')}}</label>
+            <ul class="cat-check-lists">
+                {!! cat_check_lists($cats, $curr_cats) !!}
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <label>{{trans('manage.new_tags')}}</label>
+            <select name="new_tags[]" multiple class="new_tags form-control" style="width: 97%;">
+                @if(old('new_tags'))
+                @foreach(old('new_tags') as $tag)
+                <option selected value="{{$tag}}">{{$tag}}</option>
+                @endforeach
+                @endif
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>{{trans('manage.available_tags')}}</label>
+            <select name="tag_ids[]" multiple class="av_tags form-control" style="width: 97%;">
+                <?php $curr_tags = $curr_tags ? $curr_tags : []; ?>
+                @foreach($tags as $tag)
+                <option value="{{$tag->id}}" {{ in_array($tag->id, $curr_tags) ? 'selected' : '' }}>{{$tag->name}}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>{{trans('manage.comment_status')}}</label>
+            {!! Form::select('status', [1 => 'Open', 0 => 'Close'], $item->comment_status, ['class' => 'form-control']) !!}
+        </div>
+
+        <div class="form-group">
+            <label>{{trans('manage.views')}}</label>
+            {!! Form::number('views', $item->views, ['class' => 'form-control']) !!}
+        </div>
         
         <input type="hidden" name="lang" value="{{$lang}}">
         {!! error_field('lang') !!}
@@ -145,18 +158,23 @@
 
 {!! Form::close() !!}
 
+@else
+<p>{{trans('manage.no_item')}}</p>
+@endif
+
 @stop
 
 @section('foot')
-<script src="/adminsrc/js/select2.min.js"></script>
-<script src="/plugins/angular/angular.min.js"></script>
+<script src="/plugins/tinymce/tinymce.min.js"></script>
+
 <script>
-    (function ($) {
-        $('.new_tags').select2({
-            tags: true
-        });
-        $('.av_tags').select2();
-    })(jQuery);
+    var files_url = '<?php echo route('file.index') ?>';
+    var filemanager_title = '<?php echo trans('manage.man_files') ?>';
 </script>
+
+<script src="/adminsrc/js/tinymce_script.js"></script>
+
+@include('files.modal')
+
 @stop
 

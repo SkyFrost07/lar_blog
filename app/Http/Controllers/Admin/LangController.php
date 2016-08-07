@@ -60,6 +60,6 @@ class LangController extends Controller
     }
     
     public function multiAction(Request $request){
-        return response()->json($result = $this->lang->actions($request));
+        return response()->json($this->lang->actions($request));
     }
 }

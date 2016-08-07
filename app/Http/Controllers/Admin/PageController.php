@@ -4,18 +4,27 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Eloquents\PageEloquent;
 use Illuminate\Validation\ValidationException;
 use App\Exceptions\DbException;
+use File;
 
 class PageController extends Controller
 {
     protected $page;
+    protected $templates = [];
 
     public function __construct(PageEloquent $page) {
         $this->page = $page;
+        $this->templates = ['' => trans('manage.selection')];
+        
+        $view_path = config('view.paths')[0].'\front\templates';
+        $files = File::files($view_path);
+        foreach ($files as $file){
+            $name = explode('.', basename($file))[0];
+            $this->templates[$name] = $name;
+        }
     }
 
     public function index(Request $request) {
@@ -26,7 +35,7 @@ class PageController extends Controller
     public function create() {
         canAccess('publish_posts');
 
-        return view('manage.page.create');
+        return view('manage.page.create', ['templates' => $this->templates]);
     }
 
     public function store(Request $request) {
@@ -42,11 +51,16 @@ class PageController extends Controller
         }
     }
 
-    public function edit($id) {
+    public function edit($id, Request $request) {
         canAccess('edit_my_post', $this->page->get_author_id($id));
 
-        $item = $this->page->findByLang($id);
-        return view('manage.page.edit', compact('item'));
+        $lang = current_locale();
+        if($request->has('lang')){
+            $lang = $request->get('lang');
+        }
+        $item = $this->page->findByLang($id, ['posts.*', 'pd.*'], $lang);
+        $templates = $this->templates;
+        return view('manage.page.edit', compact('item', 'templates', 'lang'));
     }
 
     public function update($id, Request $request) {
@@ -66,6 +80,6 @@ class PageController extends Controller
     }
 
     public function multiAction(Request $request) {
-        return $result = $this->page->actions($request);
+        return response()->json($this->page->actions($request));
     }
 }

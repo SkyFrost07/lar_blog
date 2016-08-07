@@ -19,8 +19,9 @@ class CreateFilesTbl extends Migration
            $table->string('rand_dir')->unique();
            $table->string('type')->default('image');
            $table->string('mimetype');
-           $table->integer('author_id')->references('id')->on('users')->onDelete('set null');
+           $table->integer('author_id');
            $table->timestamps();
+           $table->foreign('author_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

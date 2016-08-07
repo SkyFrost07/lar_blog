@@ -23,4 +23,15 @@ class Page extends Model
         return $this->belongsToMany('\App\Models\Lang', 'post_desc', 'post_id', 'lang_id')
                 ->where('post_type', 'page');
     }
+    
+    public function getImage($size='full'){
+        return getImageSrc($this->thumb_id, $size);
+    }
+    
+    public function str_status() {
+        if ($this->status == 0) {
+            return 'Trash';
+        }
+        return 'Active';
+    }
 }

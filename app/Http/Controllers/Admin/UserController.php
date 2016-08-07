@@ -74,6 +74,6 @@ class UserController extends Controller
     }
     
     public function multiAction(Request $request){
-        return response()->json($result = $this->user->actions($request));
+        return response()->json($this->user->actions($request));
     }
 }

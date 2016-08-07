@@ -62,6 +62,6 @@ class RoleController extends Controller
     }
     
     public function multiAction(Request $request){
-        return $result = $this->role->actions($request);
+        return response()->json($this->role->actions($request));
     }
 }

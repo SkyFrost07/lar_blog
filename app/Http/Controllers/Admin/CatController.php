@@ -13,11 +13,13 @@ use DB;
 class CatController extends Controller {
 
     protected $cat;
+    protected $locale;
 
     public function __construct(CatEloquent $cat) {
         canAccess('manage_cats');
 
         $this->cat = $cat;
+        $this->locale = current_locale();
     }
 
     public function index(Request $request) {
@@ -81,7 +83,7 @@ class CatController extends Controller {
     }
 
     public function multiAction(Request $request) {
-        return response()->json($result = $this->cat->actions($request));
+        return response()->json($this->cat->actions($request));
     }
 
 }

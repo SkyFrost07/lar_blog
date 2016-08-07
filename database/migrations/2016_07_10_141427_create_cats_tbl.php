@@ -14,9 +14,9 @@ class CreateCatsTbl extends Migration
     {
         Schema::create('taxs', function(Blueprint $table){
            $table->increments('id');
-           $table->integer('image_id')->references('id')->on('files')->onDelete('set default');
+           $table->integer('image_id');
            $table->string('type', 30)->default('cat');
-           $table->integer('parent_id')->default(0)->references('id')->on('taxs')->onDelete('set default');
+           $table->integer('parent_id');
            $table->integer('order');
            $table->integer('count');
            $table->integer('status')->default(1);
@@ -24,8 +24,8 @@ class CreateCatsTbl extends Migration
         });
         
         Schema::create('tax_desc', function(Blueprint $table){
-           $table->integer('tax_id')->references('id')->on('taxs')->onDelete('cascade');
-           $table->integer('lang_id')->references('id')->on('langs')->onDelete('cascade');
+           $table->integer('tax_id');
+           $table->integer('lang_id');
            $table->string('name');
            $table->string('slug');
            $table->text('description', 500);
@@ -33,6 +33,8 @@ class CreateCatsTbl extends Migration
            $table->text('meta_desc', 500);
            $table->primary(['tax_id', 'lang_id']);
            $table->timestamps();
+           $table->foreign('tax_id')->references('id')->on('taxs')->onDelete('cascade');
+           $table->foreign('lang_id')->references('id')->on('langs')->onDelete('cascade');
         });
     }
 

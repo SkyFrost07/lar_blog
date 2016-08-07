@@ -12,13 +12,13 @@
         {!! show_messes() !!}
 
         {!! Form::open(['method' => 'post', 'route' => 'menucat.store']) !!}
-        
-        @include('manage.parts.lang_tags')
+
+        @include('manage.parts.lang_tabs')
 
         <div class="tab-content">
             @foreach($langs as $lang)
             <?php $code = $lang->code; ?>
-            <div class="tab-pane {{ localeActive($code) }}" id="tab-{{$lang->code}}">
+            <div class="tab-pane fade in {{ locale_active($code) }}" id="tab-{{$lang->code}}">
 
                 <div class="form-group">
                     <label>{{trans('manage.name')}} (*)</label>
@@ -35,8 +35,10 @@
             @endforeach
         </div>
 
-        <a href="{{route('menucat.index')}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
-        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{trans('manage.create')}}</button>
+        <div class="form-group">
+            <a href="{{route('menucat.index')}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{trans('manage.create')}}</button>
+        </div>
 
         {!! Form::close() !!}
     </div>

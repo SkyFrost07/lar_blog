@@ -7,11 +7,9 @@ use App\Eloquents\BaseEloquent;
 class PageEloquent extends BaseEloquent {
 
     protected $model;
-    protected $tag;
 
-    public function __construct(\App\Models\Page $model, \App\Models\Tag $tag) {
+    public function __construct(\App\Models\Page $model) {
         $this->model = $model;
-        $this->tag = $tag;
     }
 
     public function rules($update = false) {
@@ -31,7 +29,7 @@ class PageEloquent extends BaseEloquent {
         $opts = [
             'fields' => ['posts.*', 'pd.*'],
             'status' => 1,
-            'orderby' => 'created_at',
+            'orderby' => 'posts.created_at',
             'order' => 'desc',
             'per_page' => 20,
             'exclude' => [],
@@ -65,6 +63,9 @@ class PageEloquent extends BaseEloquent {
             $time = $data['time'];
             $data['created_at'] = date('Y-m-d H:i:s', strtotime($time['year'] . '-' . $time['month'] . '-' . $time['day'] . ' ' . date('H:i:s')));
         }
+        if($data['thumb_id']){
+            $data['thumb_id'] = cutImgPath($data['thumb_id']);
+        }
         $item = $this->model->create($data);
 
         $langs = get_langs(['fields' => ['id', 'code']]);
@@ -82,15 +83,25 @@ class PageEloquent extends BaseEloquent {
         return $item;
     }
     
-    public function findByLang($id, $fields = ['taxs.*', 'pd.*'], $lang = null) {
+    public function findByLang($id, $fields = ['posts.*', 'pd.*'], $lang = null) {
         $item = $this->model->joinLang($lang)
                 ->find($id, $fields);
-        return $item;
+        if($item){
+            return $item;
+        }
+        return $this->model->find($id);
     }
 
     public function update($id, $data) {
-        $this->validator($data, $this->rules());
+        $this->validator($data, $this->rules(true));
 
+        if (isset($data['time'])) {
+            $time = $data['time'];
+            $data['created_at'] = date('Y-m-d H:i:s', strtotime($time['year'] . '-' . $time['month'] . '-' . $time['day'] . ' ' . date('H:i:s')));
+        }
+        if($data['thumb_id']){
+            $data['thumb_id'] = cutImgPath($data['thumb_id']);
+        }
         $fillable = $this->model->getFillable();
         $fill_data = array_only($data, $fillable);
         $item = $this->model->find($id);

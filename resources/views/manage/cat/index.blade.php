@@ -41,7 +41,6 @@
                 <th>{{trans('manage.parent')}} {!! link_order('parent_id') !!}</th>
                 <th>{{trans('manage.order')}} {!! link_order('order') !!}</th>
                 <th>{{trans('manage.count')}} {!! link_order('count') !!}</th>
-                <th>{{trans('manage.status')}} {!! link_order('status') !!}</th>
                 <th width="93">{{trans('manage.actions')}}</th>
             </tr>
         </thead>

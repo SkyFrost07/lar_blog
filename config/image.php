@@ -15,6 +15,13 @@ return array(
     |
     */
 
-    'driver' => 'gd'
+    'driver' => 'gd',
+    
+    'paths' => [ '../../thumbnail/', '../../medium/', '../../large', '../../full'],
+    'prepends' => [],
+    'appends' => [],
+    'widths' => [80, 300, 600, ''],
+    'heights' => [80, 200, '', ''],
+    'options' => ['crop', 'crop', 'auto', 'auto']
 
 );

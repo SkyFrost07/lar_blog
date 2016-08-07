@@ -3,6 +3,9 @@
 Route::get('/files/dialog', function() {
     return view('files.dialog');
 });
+Route::get('/files/manage', function(){
+    return view('filemanager.dialog');
+});
 
 use Illuminate\Http\Request;
 use App\Eloquents\FileEloquent;
@@ -52,6 +55,7 @@ Route::group(['prefix' => 'test'], function() {
     });
 
     Route::get('/perform', function(LangEloquent $lang) {
+        return Cat::max('parent_id');
         $start = microtime(true);
         for($i=0; $i<500; $i++){
 //            $result = Lang::where('code', 'vi')->first(['id'])->id;
@@ -83,5 +87,12 @@ Route::group(['prefix' => 'test'], function() {
         $finish = microtime(true);
         echo $finish - $start;
         dd($result);
+    });
+    
+    Route::get('/findbylang', function(){
+//       return \App\Models\Post::findByLang(15, ['posts.*', 'pd.*'], 'en')->get(); 
+//        $data = \App\Models\Post::joinLang('en')->find(14, ['posts.*', 'pd.*']);
+        $data = \App\Models\Post::joinDesc(15)->get();
+        dd($data);
     });
 });

@@ -10,6 +10,8 @@
     <div class="col-sm-6">
 
         {!! show_messes() !!}
+        
+        @if($item)
 
         @include('manage.parts.lang_edit_tabs', ['route' => 'tag.edit'])
 
@@ -54,6 +56,10 @@
 
         {!! Form::close() !!}
 
+        @else
+        <p>{{trans('manage.no_item')}}</p>
+        @endif
+        
     </div>
 </div>
 

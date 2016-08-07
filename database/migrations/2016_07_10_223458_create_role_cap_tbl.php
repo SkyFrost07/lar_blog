@@ -20,6 +20,10 @@ class CreateRoleCapTbl extends Migration
            $table->timestamps();
        });
        
+       Schema::table('users', function(Blueprint $table){
+           $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null');
+       });
+       
        Schema::create('caps', function(Blueprint $table){
            $table->increments('id');
            $table->string('name');
@@ -29,9 +33,11 @@ class CreateRoleCapTbl extends Migration
        });
        
        Schema::create('role_cap', function(Blueprint $table){
-           $table->integer('role_id')->references('id')->on('roles')->onDelete('cascade');
-           $table->integer('cap_id')->references('id')->on('caps')->onDelete('cascade');
+           $table->integer('role_id');
+           $table->integer('cap_id');
            $table->primary(['role_id', 'cap_id']);
+           $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+           $table->foreign('cap_id')->references('id')->on('caps')->onDelete('cascade');
        });
     }
 

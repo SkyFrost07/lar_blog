@@ -14,11 +14,13 @@ function show_messes($txt_class = null, $box_class = null) {
     $result = '';
     if (Session::has('error_mess')) {
         $result = '<div class="alert alert-warning alert-dismissible border_box ' . $box_class . '">'
+                . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
                 . '<div class="error_mess ' . $txt_class . '">' . Session::get('error_mess') . '</div></div>';
         Session::forget('error_mess');
     }
     if (Session::has('succ_mess')) {
-        $result = '<div class="alert alert-dismissible border_box ' . $box_class . '">'
+        $result = '<div class="alert alert-success alert-dismissible border_box ' . $box_class . '">'
+                . '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
                 . '<div class="succ_mess ' . $txt_class . '">' . Session::get('succ_mess') . '</div></div>';
         Session::forget('succ_mess');
     }
@@ -114,6 +116,13 @@ function isActive($route, $status = null, $active = 'active') {
     return null;
 }
 
+function isRoute($route, $params=[], $active='active'){
+    if(request()->url() == route($route, $params)){
+        return $active;
+    }
+    return null;
+}
+
 function nested_option($items, $selected = 0, $parent = 0, $depth = 0) {
     $html = '';
     $intent = str_repeat('-- ', $depth);
@@ -179,4 +188,28 @@ function cat_check_lists($items, $checked=[], $parent=0, $depth=0){
         }
     }
     return $html;
+}
+
+function cutImgPath($full_url){
+    $path = parse_url($full_url)['path'];
+    $img_path = $full_url;
+    if($path){
+        $arr_path = explode('/', trim($path, '/'));
+        unset($arr_path[0]);
+        unset($arr_path[1]);
+        $img_path = implode('/', $arr_path);
+    }
+    return $img_path;
+}
+
+function getImageSrc($img_path, $size='full'){
+    $sizes = ['thumbnail', 'medium', 'large', 'full'];
+    if(!in_array($size, $sizes)){
+        $size = 'full';
+    }
+    $url = 'uploads/'.$size.'/'.trim($img_path, '/');
+    if(File::exists(trim($url))){
+        return '/'.$url;
+    } 
+    return '/uploads/full/'.trim($img_path, '/');
 }

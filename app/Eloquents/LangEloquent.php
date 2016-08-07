@@ -45,11 +45,14 @@ class LangEloquent extends BaseEloquent {
         $opts = array_merge($opts, $args);
 
         $results = $this->model
-                ->where('status', $opts['status'])
                 ->whereNotIn('id', $opts['exclude'])
                 ->where('name', 'like', '%'.$opts['key'].'%')
                 ->orderBy($opts['orderby'], $opts['order'])
                 ->select($opts['fields']);
+        
+        if($opts['status'] != -1){
+            $results = $results->where('status', $opts['status']);
+        }
         
         if($opts['per_page'] == -1){
             $results = $results->get();

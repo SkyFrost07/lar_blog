@@ -3,6 +3,7 @@
 namespace App\Eloquents;
 
 use App\Eloquents\BaseEloquent;
+use Form;
 
 class MenuCatEloquent extends BaseEloquent {
 
@@ -11,8 +12,8 @@ class MenuCatEloquent extends BaseEloquent {
     public function __construct(\App\Models\MenuCat $model) {
         $this->model = $model;
     }
-    
-    public function rules($update) {
+
+    public function rules($update = false) {
         $code = current_locale();
         if (!$update) {
             return [
@@ -56,10 +57,8 @@ class MenuCatEloquent extends BaseEloquent {
     public function insert($data) {
         $this->validator($data, $this->rules());
 
-        $fillable = $this->model->getFillable();
         $data['type'] = 'menucat';
-        $fill_data = array_only($data, $fillable);
-        $item = $this->model->create($fill_data);
+        $item = $this->model->create($data);
 
         foreach (get_langs(['fields' => ['id', 'code']]) as $lang) {
             $lang_data = $data[$lang->code];
@@ -70,11 +69,14 @@ class MenuCatEloquent extends BaseEloquent {
             $item->langs()->attach($lang->id, $lang_data);
         }
     }
-    
+
     public function findByLang($id, $fields = ['taxs.*', 'td.*'], $lang = null) {
         $item = $this->model->joinLang($lang)
                 ->find($id, $fields);
-        return $item;
+        if ($item) {
+            return $item;
+        }
+        return $this->model->find($id);
     }
 
     public function update($id, $data) {
@@ -105,8 +107,52 @@ class MenuCatEloquent extends BaseEloquent {
                 $item->langs()->detach();
             }
         }
+    }
 
-        return parent::destroy($ids);
+    public function toNested($items, $parent = 0) {
+        $results = [];
+        foreach ($items as $item) {
+            if ($item->parent_id == $parent) {
+                $nitem = $item;
+                $childs = $this->toNested($items, $item->id);
+                $nitem['childs'] = $childs;
+                $results[] = $nitem;
+            }
+        }
+        return $results;
+    }
+
+    public function nestedMenus($lists, $parent) {
+        $output = '';
+        foreach ($lists as $key => $item) {
+            if ($item->parent_id == $parent) {
+                $output .= '<li data-id="' . $item->id . '" class="dd-item dd3-item">';
+                $output.= '<div class="dd-handle dd3-handle"></div>';
+                $output.= '<div class="dd3-content">'
+                        . '<span class="title">' . $item->title . '</span>'
+                        . '<span class="actions">'
+                        . '<a href="#menu-edit-' . $item->id . '" data-toggle="collapse" class="btn btn-info btn-sm"><i class="fa fa-pencil"></i></a>'
+                        . '</span>'
+                        . '</div>'
+                        . '<div id="menu-edit-' . $item->id . '" class="mi-content collapse">'
+                        . '<div class="form-group"><label>' . trans('manage.title') . '</label>'
+                        . Form::text('menus[' . $item->id . '][locale][title]', $item->title, ['class' => 'form-control'])
+                        . '</div>'
+                        . '<div class="form-group"><label>' . trans('manage.open_type') . '</label>'
+                        . Form::select('menus[' . $item->id . '][open_type]', ['' => trans('manage.current_tab'), '_blank' => trans('manage.new_tab')], $item->open_type, ['class' => 'form-control'])
+                        . '</div>'
+                        . '<div class="form-group"><label>' . trans('manage.icon') . '</label>'
+                        . Form::text('menus[' . $item->id . '][icon]', $item->icon, ['class' => 'form-control'])
+                        . '</div>'
+                        . '</div>';
+                $output2 = $this->nestedMenus($lists, $item->id);
+                if ($output2 != '') {
+                    $output .= '<ol class="childs dd-list">' . $output2 . '</ol>';
+                }
+                $output .= '</li>';
+            }
+        }
+        return $output;
     }
 
 }

@@ -26,17 +26,17 @@ class Menu extends Model
         return $this->belongsTo('App\Models\MenuCat', 'group_id', 'id');
     }
 
-    public function status(){
+    public function str_status(){
         if($this->status == 1){
-            return 'Active';
+            return trans('manage.active');
         }
-        return 'Disable';
+        return trans('manage.disable');
     }
     
     public function str_open_type(){
         if($this->open_type){
-            return 'New tab';
+            return trans('manage.newtab_tab');
         }
-        return 'Current tab';
+        return trans('manage.current_tab');
     }
 }

@@ -14,9 +14,9 @@ class CreatePostTable extends Migration
     {
         Schema::create('posts', function(Blueprint $table){
             $table->increments('id');
-            $table->integer('thumb_id')->references('id')->on('files')->onDelete('set null');
+            $table->string('thumb_id');
             $table->string('thumb_ids');
-            $table->integer('author_id')->references('id')->on('users')->onDelete('set null');
+            $table->integer('author_id');
             $table->tinyInteger('status')->default(1);
             $table->tinyInteger('comment_status')->default(1);
             $table->integer('comment_count');
@@ -26,11 +26,12 @@ class CreatePostTable extends Migration
             $table->index(['id', 'post_type']);
             $table->timestamps();
             $table->timestamp('trashed_at');
+            $table->foreign('author_id')->references('id')->on('users')->onDelete('set null');
         });
         
         Schema::create('post_desc', function(Blueprint $table){
-            $table->integer('post_id')->references('id')->on('posts')->onDelete('cascade');
-            $table->integer('lang_id')->references('id')->on('langs')->onDelete('cascade');
+            $table->integer('post_id');
+            $table->integer('lang_id');
             $table->string('title');
             $table->string('slug');
             $table->text('excerpt');
@@ -39,12 +40,16 @@ class CreatePostTable extends Migration
             $table->string('meta_keyword');
             $table->text('meta_desc');
             $table->primary(['post_id', 'lang_id']);
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->foreign('lang_id')->references('id')->on('langs')->onDelete('cascade');
         });
         
         Schema::create('post_tax', function(Blueprint $table){
-            $table->integer('post_id')->references('id')->on('posts')->onDelete('cascade');
-            $table->integer('tax_id')->references('id')->on('taxs')->onDelete('cascade');
+            $table->integer('post_id');
+            $table->integer('tax_id');
             $table->primary(['post_id', 'tax_id']);
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->foreign('tax_id')->references('id')->on('taxs')->onDelete('cascade');
         });
     }
 

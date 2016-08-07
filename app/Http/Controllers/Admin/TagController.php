@@ -64,6 +64,6 @@ class TagController extends Controller
     }
 
     public function multiAction(Request $request) {
-        return response()->json($result = $this->tag->actions($request));
+        return response()->json($this->tag->actions($request));
     }
 }

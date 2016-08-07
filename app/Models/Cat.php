@@ -50,9 +50,9 @@ class Cat extends Model {
     public function status() {
         switch ($this->status) {
             case 0:
-                return 'Disable';
+                return trans('manage.disable');
             case 1:
-                return 'Active';
+                return trans('manage.enable');
         }
     }
 

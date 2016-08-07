@@ -12,7 +12,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'birth', 'gender', 'status'
+        'name', 'email', 'password', 'birth', 'gender', 'status', 'image_id', 'role_id'
     ];
 
     /**
@@ -24,6 +24,9 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
     
+    protected $dates = ['created_at', 'updated_at', 'birth'];
+
+
     public function role(){
         return $this->hasOne('\App\Models\Role', 'id', 'role_id');
     }
@@ -34,6 +37,10 @@ class User extends Authenticatable
     
     public function scopeSearch($query, $key){
         return $query->where('email', 'like', "%$key%");
+    }
+    
+    public function getImage($size='full'){
+        return getImageSrc($this->image_id, $size);
     }
     
     public function status(){

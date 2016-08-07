@@ -49,7 +49,7 @@ class MenuController extends Controller {
         $posts = $this->post->all(['orderby' => 'pivot_title', 'fields' => ['id']]);
         $pages = $this->page->all(['orderby' => 'pivot_title', 'fields' => ['id']]);
         return view('manage.menu.create', [
-            'parents' => $parents, 
+            'parents' => $parents,
             'groups' => $groups,
             'cats' => $cats,
             'tags' => $tags,
@@ -89,9 +89,59 @@ class MenuController extends Controller {
         }
         return redirect()->back()->with('succ_mess', trans('manage.destroy_success'));
     }
+    
+    public function asynDestroy(Request $request){
+        if(!$request->has('id')){
+            return response()->json(trans('manage.no_item'), 422);
+        }
+        $id = $request->get('id');
+        $this->menu->destroy($id);
+        return response()->json(trans('manage.destroy_success'));
+    }
 
     public function multiAction(Request $request) {
         return response()->json($result = $this->menu->actions($request));
+    }
+
+    public function getType(Request $request) {
+        if (!$request->has('menu_id')) {
+            return response()->json(trans('manage.no_item'), 422);
+        }
+        $lang = current_locale();
+        if($request->has('lang')){
+            $lang = $request->get('lang');
+        }
+        
+        $menu_id = $request->get('menu_id');
+
+        $menu = $this->menu->find($menu_id);
+        if (!$menu) {
+            return response()->json(trans('manage.no_item'), 422);
+        }
+
+        $result = null;
+        switch ($menu->menu_type) {
+            case 0:
+                $result = $this->menu->findCustom($menu_id, ['md.*'], $lang);
+                break;
+            case 1:
+                $result = $this->post->findByLang($menu->type_id, ['posts.id', 'pd.title'], $lang);
+                break;
+            case 2:
+                $result = $this->page->findByLang($menu->type_id, ['posts.id', 'pd.title'], $lang);
+                break;
+            case 3:
+                $result = $this->cat->findByLang($menu->type_id, ['taxs.id', 'td.name'], $lang);
+                break;
+            case 4:
+                $result = $this->tag->findByLang($menu->type_id, ['taxs.id', 'td.name'], $lang);
+                break;
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json($result);
+        }
+        return $result;
     }
 
 }

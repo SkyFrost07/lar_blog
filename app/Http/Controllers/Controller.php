@@ -11,14 +11,4 @@ use Illuminate\Foundation\Auth\Access\AuthorizesResources;
 class Controller extends BaseController
 {
     use AuthorizesRequests, AuthorizesResources, DispatchesJobs, ValidatesRequests;
-    
-    protected $locale;
-    
-    public function __construct() {
-        $request = request();
-        $this->locale = app()->getLocale();
-        if($request->has('lang')){
-            $this->locale = $request->get('lang');
-        }
-    }
 }

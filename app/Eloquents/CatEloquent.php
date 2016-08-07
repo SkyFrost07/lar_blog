@@ -66,7 +66,10 @@ class CatEloquent extends BaseEloquent {
         $item = $this->model->create($fill_data);
 
         if (isset($fill_data['parent_id']) && $fill_data['parent_id']) {
-            $item->relations()->attach($fill_data['parent_id']);
+            $parent_id = $fill_data['parent_id'];
+            $parent_ids = DB::table('tax_relations')->distinct()->where('tax_id', $parent_id)->lists('parent_id');
+            array_push($parent_ids, $parent_id);
+            $item->relations()->attach($parent_ids);
         }
 
         foreach (get_langs(['fields' => ['id', 'code']]) as $lang) {
@@ -82,7 +85,10 @@ class CatEloquent extends BaseEloquent {
     public function findByLang($id, $fields = ['taxs.*', 'td.*'], $lang = null) {
         $item = $this->model->joinLang($lang)
                 ->find($id, $fields);
-        return $item;
+        if($item){
+            return $item;
+        }
+        return $this->model->find($id);
     }
 
     public function update($id, $data) {
@@ -94,7 +100,10 @@ class CatEloquent extends BaseEloquent {
         $item->update($fill_data);
         
         if (isset($fill_data['parent_id']) && $fill_data['parent_id']) {
-            $item->relations()->sync($fill_data['parent_id']);
+            $parent_id = $fill_data['parent_id'];
+            $parent_ids = DB::table('tax_relations')->distinct()->where('tax_id', $parent_id)->lists('parent_id');
+            array_push($parent_ids, $parent_id);
+            $item->relations()->sync($parent_ids);
         }
 
         $lang_id = get_lang_id($data['lang']);
@@ -133,8 +142,7 @@ class CatEloquent extends BaseEloquent {
                 <td>' . $item->slug . '</td>
                 <td>' . $item->parent_name() . '</td>
                 <td>' . $item->order . '</td>
-                <td>' . $item->count . '</td>
-                <td>' . $item->status() . '</td>
+                <td><a href="'.route('post.index', ['cats' => [$item->id], 'status' => 1]).'">' . $item->count . '</a></td>
                 <td>
                     <a href="' . route('cat.edit', ['id' => $item->id]) . '" class="btn btn-sm btn-info" title="' . trans('manage.edit') . '"><i class="fa fa-edit"></i></a>
                     

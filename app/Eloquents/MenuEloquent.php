@@ -12,27 +12,34 @@ class MenuEloquent extends BaseEloquent {
         $this->model = $model;
     }
 
-    public function rules() {
-        return [];
+    public function rules($update = false) {
+        
     }
 
     public function all($args = []) {
         $opts = [
-            'fields' => ['*'],
+            'fields' => ['menus.*', 'md.*'],
+            'group_id' => -1,
             'orderby' => 'order',
             'order' => 'asc',
             'per_page' => 20,
             'exclude' => [],
             'key' => '',
+            'lang' => current_locale()
         ];
 
         $opts = array_merge($opts, $args);
 
-        $result = $this->model->joinLang()
-                ->where('md.name', 'like', '%' . $opts['key'] . '%')
+        $result = $this->model->joinLang($opts['lang'])
+                ->where('md.title', 'like', '%' . $opts['key'] . '%')
                 ->whereNotIn('menus.id', $opts['exclude'])
                 ->select($opts['fields'])
                 ->orderBy($opts['orderby'], $opts['order']);
+
+        if ($opts['group_id'] > -1) {
+            $result = $result->where('group_id', $opts['group_id']);
+        }
+
         if ($opts['per_page'] == -1) {
             $result = $result->get();
         } else {
@@ -42,43 +49,61 @@ class MenuEloquent extends BaseEloquent {
     }
 
     public function insert($data) {
-        $this->validator($data, $this->rules());
-        
-        $fillable = $this->model->getFillable();
-        $data['type'] = 'tag';
-        $fill_data = array_only($data, $fillable);
-        $item = $this->model->create($fill_data);
-        
-        
-   
+        if (!isset($data['order'])) {
+            $data['order'] = $this->model->max('order') + 1;
+        }
+
+        $item = $this->model->create($data);
+
+        $langs = get_langs(['fields' => ['id', 'code']]);
+        foreach ($langs as $lang) {
+            $lang_data = [
+                'title' => isset($data['title']) ? $data['title'] : $data['name'],
+                'link' => isset($data['link']) ? $data['link'] : ''
+            ];
+            $item->langs()->attach($lang->id, $lang_data);
+        }
+    }
+
+    public function findCustom($id, $fields = ['md.*'], $lang = null) {
+        return $this->model->joinLang($lang)
+                        ->find($id, $fields);
     }
 
     public function update($id, $data) {
-        $this->validator($data, $this->rules());
 
         $fillable = $this->model->getFillable();
         $fill_data = array_only($data, $fillable);
-        if(isset($data['title'])){
-            $fill_data['slug'] = str_slug($data['title']);
-        }
-        $this->model->where('id', $id)->update($fill_data);
+        $item = $this->model->find($id);
+        $item->update($fill_data);
 
-        foreach (get_langs() as $lang) {
-            $lang_data = $data[$lang->code];
-
-            $lang->menus()->sync([$id => $lang_data], false);
-        }
+        $lang_id = get_lang_id($data['lang']);
+        $lang_data = $data['locale'];
+        $item->langs()->sync([$lang_id => $lang_data], false);
     }
 
-    public function switch_type($type) {
-        
+    public function updateOrder($id, $order, $parent = 0) {
+        $item = $this->model->find($id);
+        if ($item) {
+            $item->update(['order' => $order, 'parent_id' => $parent]);
+        }
     }
 
     public function destroy($ids) {
-        foreach (get_langs() as $lang) {
-            $lang->menus()->detach($ids);
+        if (!is_array($ids)) {
+            $ids = [$ids];
         }
-        return parent::destroy($ids);
+        if ($ids) {
+            foreach ($ids as $id) {
+                $item = $this->model->find($id);
+                if ($item) {
+                    $item->langs()->detach();
+                    $item->delete();
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
 }

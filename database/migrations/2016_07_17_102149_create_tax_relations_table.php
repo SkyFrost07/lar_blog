@@ -13,9 +13,11 @@ class CreateTaxRelationsTable extends Migration
     public function up()
     {
         Schema::create('tax_relations', function(Blueprint $table){
-            $table->integer('tax_id')->references('id')->on('taxs')->onDelete('cascade');
-            $table->integer('parent_id')->references('id')->on('taxs')->onDelete('cascade');
+            $table->integer('tax_id');
+            $table->integer('parent_id');
             $table->primary(['tax_id', 'parent_id']);
+            $table->foreign('tax_id')->references('id')->on('taxs')->onDelete('cascade');
+            $table->foreign('parent_id')->references('id')->on('taxs')->onDelete('cascade');
         });
     }
 

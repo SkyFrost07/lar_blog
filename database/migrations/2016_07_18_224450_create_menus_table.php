@@ -14,8 +14,8 @@ class CreateMenusTable extends Migration
     {
         Schema::create('menus', function(Blueprint $table){
             $table->increments('id');
-            $table->integer('group_id')->references('id')->on('taxs')->onDelete('set null');
-            $table->integer('parent_id')->references('id')->on('menus')->onDelete('set null');
+            $table->integer('group_id');
+            $table->integer('parent_id');
             $table->tinyInteger('menu_type')->default(0);
             $table->integer('type_id');
             $table->string('icon', 64);
@@ -23,15 +23,18 @@ class CreateMenusTable extends Migration
             $table->tinyInteger('order')->default(0);
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
+            $table->foreign('group_id')->references('id')->on('taxs')->onDelete('set null');
         });
         
         Schema::create('menu_desc', function(Blueprint $table){
-            $table->integer('menu_id')->references('id')->on('menus')->onDelete('cascade');
-            $table->integer('lang_id')->references('id')->on('langs')->onDelete('cascade');
+            $table->integer('menu_id');
+            $table->integer('lang_id');
             $table->string('title');
             $table->string('slug');
             $table->string('link');
             $table->primary(['menu_id', 'lang_id']);
+            $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
+            $table->foreign('lang_id')->references('id')->on('langs')->onDelete('cascade');
         });
     }
 

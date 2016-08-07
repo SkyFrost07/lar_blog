@@ -63,6 +63,6 @@ class CapController extends Controller
     }
     
     public function multiAction(Request $request){
-        return response()->json($result = $this->cap->actions($request));
+        return response()->json($this->cap->actions($request));
     }
 }

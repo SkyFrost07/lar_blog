@@ -1,12 +1,10 @@
 @extends('layouts.manage')
 
-@section('title', trans('manage.man_posts'))
+@section('title', trans('manage.man_pages'))
 
 @section('page_title', trans('manage.create'))
 
-@section('head')
-<link rel="stylesheet" href="/adminsrc/css/select2.min.css">
-@stop
+@section('bodyAttrs', 'ng-app="ngFile" ng-controller="FileCtrl"')
 
 @section('content')
 
@@ -14,10 +12,10 @@
 
 <?php $langs = get_langs(); ?>
 
-{!! Form::open(['method' => 'post', 'route' => 'post.store']) !!}
+{!! Form::open(['method' => 'post', 'route' => 'page.store']) !!}
 
 <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-9">
 
         @include('manage.parts.lang_tabs')
 
@@ -63,28 +61,21 @@
 
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-3">
         
-        <div class="form-group thumb_box" ng-app="ngFile" ng-controller="FileCtrl">
-            <label>{{trans('manage.thumbnail')}}</label>
-            <div class="thumb_group" ng-if="checked_files.length > 0">
-                <div class="thumb_item" ng-repeat="file in checked_files">
-                    <img src="{% file.url %}" class="img-responsive">
-                    <input type="hidden" name="image_id" value="{% file.id %}">
-                    <button type="button" ng-click="removeFile(file)" class="close"><i class="fa fa-close"></i></button>
-                </div>
-            </div>
-            <button type="button" ng-click="loadFiles()" class="btn btn-default" data-toggle="modal" data-target="files_modal">{{trans('manage.add_image')}}</button>
-        </div>
-
         <div class="form-group">
             <label>{{trans('manage.status')}}</label>
             {!! Form::select('status', [1 => 'Active', 0 => 'Trash'], old('status'), ['class' => 'form-control']) !!}
         </div>
+        
+        <div class="form-group">
+            <label>{{trans('manage.template')}}</label>
+            {!! Form::select('template', $templates, old('template'), ['class' => 'form-control']) !!}
+        </div>
 
         <div class="form-group">
             <label>{{trans('manage.comment_status')}}</label>
-            {!! Form::select('status', [1 => 'Open', 0 => 'Close'], old('comment_status'), ['class' => 'form-control']) !!}
+            {!! Form::select('status', [0 => 'Close', 1 => 'Open'], old('comment_status'), ['class' => 'form-control']) !!}
         </div>
 
         <div class="form-group">
@@ -92,7 +83,7 @@
             {!! Form::number('views', old('views'), ['class' => 'form-control']) !!}
         </div>
         
-        @if(cando('edit_other_posts'))
+        @if(cando('edit_other_pages'))
         <div class="form-group">
             <label>{{trans('manage.created_at')}}</label>
             <div class="time_group">
@@ -118,8 +109,20 @@
         </div>
         @endif
 
+        <div class="form-group thumb_box" >
+            <label>{{trans('manage.thumbnail')}}</label>
+            <div class="thumb_group">
+                <div class="thumb_item">
+                    <a class="img_box"></a>
+                    <input type="hidden" id="file_url" name="thumb_id" value="">
+                    <div class="btn_box"></div>
+                </div>
+            </div>
+            <div><button type="button" class="btn btn-default btn-popup-files" frame-url="/plugins/filemanager/dialog.php?type=1&field_id=file_url&field_img=file_src" data-toggle="modal" data-target="#files_modal">{{trans('manage.add_image')}}</button></div>
+        </div>
+        
         <div class="form-group">
-            <a href="{{route('post.index', ['status' => 1])}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
+            <a href="{{route('page.index', ['status' => 1])}}" class="btn btn-warning"><i class="fa fa-long-arrow-left"></i> {{trans('manage.back')}}</a>
             <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{trans('manage.create')}}</button>
         </div>
 
@@ -131,15 +134,17 @@
 @stop
 
 @section('foot')
-<script src="/adminsrc/js/select2.min.js"></script>
-<script src="/plugins/angular/angular.min.js"></script>
+
+<script src="/plugins/tinymce/tinymce.min.js"></script>
+
 <script>
-    (function ($) {
-        $('.new_tags').select2({
-            tags: true
-        });
-        $('.av_tags').select2();
-    })(jQuery);
+    var files_url = '<?php echo route('file.index') ?>';
+    var filemanager_title = '<?php echo trans('manage.man_files') ?>';
 </script>
+
+<script src="/adminsrc/js/tinymce_script.js"></script>
+
+@include('files.modal')
+
 @stop
 

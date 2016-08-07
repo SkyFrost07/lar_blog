@@ -11,6 +11,8 @@
 
         {!! show_messes() !!}
         
+        @if($item)
+        
         {!! Form::open(['method' => 'put', 'route' => ['cat.update', $item->id]]) !!}
 
         @include('manage.parts.lang_edit_tabs', ['route' => 'cat.edit'])
@@ -66,6 +68,10 @@
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{trans('manage.update')}}</button>
 
         {!! Form::close() !!}
+        
+        @else
+        <p>{{trans('manage.no_item')}}</p>
+        @endif
         
     </div>
 </div>

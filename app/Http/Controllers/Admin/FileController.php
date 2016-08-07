@@ -21,11 +21,21 @@ class FileController extends Controller {
     }
 
     public function index(Request $request) {
+        canAccess('read_files');
+        
         $files = $this->file->all($request->all());
         if($request->wantsJson() || $request->ajax()){
             return response()->json($files);
         }
         return view('manage.file.index', ['items' => $files]);
+    }
+    
+    public function dialog(){
+        return view('files.dialog');
+    }
+    
+    public function manage(){
+        return view('manage.file.manage');
     }
     
     public function show($id, Request $request){
@@ -37,10 +47,14 @@ class FileController extends Controller {
     }
 
     public function create() {
+        canAccess('publish_files');
+        
         return view('manage.file.create');
     }
 
     public function store(Request $request) {
+        canAccess('publish_files');
+        
         if (!$request->hasFile('files')) {
             return redirect()->back()->withInput()->withErrors(['file' => trans('validation.required', ['attribute' => 'file'])]);
         }
@@ -63,6 +77,8 @@ class FileController extends Controller {
     }
 
     public function edit($id) {
+        canAccess('edit_my_file', $this->file->get_author_id($id));
+        
         $item = $this->file->find($id);
         $users = null;
         if(cando('manage_files')){
@@ -72,6 +88,8 @@ class FileController extends Controller {
     }
 
     public function update($id, Request $request) {
+        canAccess('edit_my_file', $this->file->get_author_id($id));
+        
         try {
             $this->file->update($id, $request->all());
             return redirect()->back()->with('succ_mess', trans('manage.update_success'));
@@ -81,6 +99,8 @@ class FileController extends Controller {
     }
 
     public function destroy($id) {
+        canAccess('remove_my_file', $this->file->get_author_id($id));
+        
         if (!$this->file->destroy($id)) {
             return redirect()->back()->with('error_mess', trans('manage.no_item'));
         }
@@ -88,7 +108,9 @@ class FileController extends Controller {
     }
 
     public function multiAction(Request $request) {
-        return $result = $this->file->actions($request);
+        canAccess('manage_files');
+        
+        return response()->json($this->file->actions($request));
     }
 
 }

@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('access', 'App\Facades\Access\Access');
 //        Languages
         $this->app->bind('languages', 'App\Facades\Lang\Lang');
+//        Options/
+        $this->app->bind('options', 'App\Facades\Option\Option');
         
     }
 }

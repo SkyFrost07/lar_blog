@@ -1,15 +1,103 @@
-a{
-    &:hover{text-decoration: none;}
+@import "../mixins.less";
+@menu_w: 230px;
+@menu_wtg: 46px;
+
+body{
+    font-size: 14px; background: @body_bg;
 }
 
-.form-inline{
+a{
+    &:hover, &:focus{text-decoration: none;}
+}
+
+.form-inline{ 
     display: inline-block;
 }
-.nav-status{
-    .active a{
-        border-bottom: 2px solid tomato;
+#head_bar{
+    background: @head_bg;
+    position: fixed;
+    top: 0; left: @menu_w; width: calc(~"100% - "@menu_w); z-index: 10000;
+    .shadown(0 0 5px);
+}
+.langs_nav{
+    a{
+        img{height: 18px; width: auto;}
     }
 }
+.menu_col{
+    background: @menu_bg;
+    width: @menu_w; height: 100%;
+    position: fixed; top: 0; left: 0;
+    .menu-brand{
+        border-bottom: 1px solid @main_bd;
+    }
+    .navbar-brand{
+        &:hover{color: #fff;}
+    }
+    a, .navbar-brand{
+        color: #fff;
+    }
+}
+.menu_col.mn_toggle{
+    width: @menu_wtg;
+    .menu-brand{
+        a span{display: none;}
+    }
+    #menu_bar{
+        a{
+            span, b{display: none;}
+        }
+    }
+}
+#menu_bar{
+    list-style: none; padding: 0;
+    a{
+        display: block;
+        padding: 7px 15px;
+        i{min-width: 20px;}
+        b{
+            float: right; 
+            padding: 3px 5px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+    }
+    .active a, a:hover{
+        background: @menu_hv;
+    }
+    .menu_childs{
+        padding-left: 0;
+        a{
+            text-indent: 12px;
+        }
+    }
+}
+.content_col{
+    margin-left: @menu_w;
+}
+.content_col.mn_toggle{
+    margin-left: @menu_wtg;
+    #head_bar{
+        left: @menu_wtg;
+        width: calc(~"100% - "@menu_wtg);
+    }
+}
+.main_content{
+    padding: 10px; margin: 10px; margin-top: 60px; background: #fff;
+}
+.page-header{
+    margin: 10px 0 12px;
+}
+#table_nav{
+    margin-bottom: 5px; border-bottom: 1px solid @main_bd;
+    ul.nav-status{
+        margin-right: 20px;
+        .active a{
+            color: #ff6600;
+        }
+    }
+}
+#files_modal{z-index: 10001;}
 .lang_tabs{
     list-style: none; padding: 0;
     li{
@@ -54,5 +142,9 @@ a{
         opacity: 0.8;
         border-radius: 50%;
     }
+}
+.max-mdh{max-height: 230px; overflow: auto;}
+.avatar_img{
+    display: inline-block; max-width: 100px;
 }
 

@@ -3,6 +3,7 @@
 namespace App\Eloquents;
 
 use App\Eloquents\BaseEloquent;
+use DB;
 
 class PostEloquent extends BaseEloquent {
 
@@ -31,30 +32,54 @@ class PostEloquent extends BaseEloquent {
         $opts = [
             'fields' => ['posts.*', 'pd.*'],
             'status' => 1,
-            'orderby' => 'created_at',
+            'orderby' => 'posts.created_at',
             'order' => 'desc',
             'per_page' => 20,
             'exclude' => [],
             'key' => '',
+            'cats' => [],
+            'tags' => [],
             'with_cats' => false,
             'with_tags' => false
         ];
 
         $opts = array_merge($opts, $args);
 
-        $result = $this->model->joinLang()
-                ->where('post_type', 'post')
+        $result = $this->model->joinLang();
+
+        if ($opts['cats']) {
+            $cat_ids = DB::table('tax_relations')
+                    ->whereIn('parent_id', $opts['cats'])
+                    ->select('tax_id')
+                    ->lists('tax_id');
+            $cat_ids = array_merge($opts['cats'], $cat_ids);
+
+            $result = $result->join('post_tax as pt', function($join) use ($cat_ids) {
+                $join->on('posts.id', '=', 'pt.post_id')
+                        ->whereIn('tax_id', $cat_ids);
+            });
+        }
+        if ($opts['tags']) {
+            $tag_ids = $opts['tags'];
+            $result = $result->join('post_tax as pt', function($join) use ($tag_ids) {
+                $join->on('posts.id', '=', 'pt.post_id')
+                        ->whereIn('tax_id', $tag_ids);
+            });
+        }
+
+        $result = $result->where('post_type', 'post')
                 ->where('posts.status', $opts['status'])
                 ->where('pd.title', 'like', '%' . $opts['key'] . '%')
                 ->whereNotIn('posts.id', $opts['exclude'])
                 ->select($opts['fields'])
+                ->groupBy('posts.id')
                 ->orderBy($opts['orderby'], $opts['order']);
 
         if ($opts['with_cats']) {
-            $result = $result->with('cats');
+            $result->with('cats');
         }
         if ($opts['with_tags']) {
-            $result = $result->with('tags');
+            $result->with('tags');
         }
 
         if ($opts['per_page'] == -1) {
@@ -73,25 +98,26 @@ class PostEloquent extends BaseEloquent {
             $time = $data['time'];
             $data['created_at'] = date('Y-m-d H:i:s', strtotime($time['year'] . '-' . $time['month'] . '-' . $time['day'] . ' ' . date('H:i:s')));
         }
+        if (isset($data['thumb_id'])) {
+            $data['thumb_id'] = cutImgPath($data['thumb_id']);
+        }
         $item = $this->model->create($data);
 
         $langs = get_langs(['fields' => ['id', 'code']]);
 
         if (isset($data['cat_ids'])) {
             $item->cats()->attach($data['cat_ids']);
+            $item->cats()->increment('count');
         }
 
         if (isset($data['new_tags'])) {
             foreach ($data['new_tags'] as $tag) {
-                $newtag = $this->tag->create(['type' => 'tag']);
+                $newtag = $this->tag->create(['type' => 'tag', 'count' => 1]);
                 foreach ($langs as $lang) {
-                    $tag_desc = [];
-                    if ($lang->code == current_locale()) {
-                        $tag_desc = [
-                            'name' => $tag,
-                            'slug' => str_slug($tag)
-                        ];
-                    }
+                    $tag_desc = [
+                        'name' => $tag,
+                        'slug' => str_slug($tag)
+                    ];
                     $newtag->langs()->attach($lang->id, $tag_desc);
                 }
                 $item->tags()->attach($newtag->id);
@@ -114,43 +140,58 @@ class PostEloquent extends BaseEloquent {
 
         return $item;
     }
-    
+
     public function findByLang($id, $fields = ['posts.*', 'pd.*'], $lang = null) {
         $item = $this->model->joinLang($lang)
                 ->find($id, $fields);
+        if ($item) {
+            return $item;
+        }
+        $item = $this->model->find($id);
         return $item;
     }
 
     public function update($id, $data) {
-        $this->validator($data, $this->rules());
+        $this->validator($data, $this->rules(true));
 
+        if ($data['thumb_id']) {
+            $data['thumb_id'] = cutImgPath($data['thumb_id']);
+        }
         $fillable = $this->model->getFillable();
         $fill_data = array_only($data, $fillable);
         $item = $this->model->find($id);
         $item->update($fill_data);
 
-        if (isset($data['cat_ids'])) {
-            $item->cats()->detach($item->cats()->lists('id')->toArray());
-            $item->cats()->attach($data['cat_ids']);
-        }
+        $old_tags = $item->tags()->lists('id')->toArray();
+        $old_cats = $item->cats()->lists('id')->toArray();
+
+        $item->cats()->detach();
 
         if (isset($data['tag_ids'])) {
-            $item->tags()->detach($item->tags()->lists('id')->toArray());
+            $item->tags()->decrement('count');
             $item->tags()->attach($data['tag_ids']);
+            $item->tags()->increment('count');
+        } else {
+            $item->tags()->attach($old_tags);
+        }
+
+        if (isset($data['cat_ids'])) {
+            $item->cats()->decrement('count');
+            $item->cats()->attach($data['cat_ids']);
+            $item->cats()->increment('count');
+        } else {
+            $item->cats()->attach($old_cats);
         }
 
         $langs = get_langs(['fields' => ['id', 'code']]);
         if (isset($data['new_tags'])) {
             foreach ($data['new_tags'] as $tag) {
-                $newtag = $this->tag->create(['type' => 'tag']);
+                $newtag = $this->tag->create(['type' => 'tag', 'count' => 1]);
                 foreach ($langs as $lang) {
-                    $tag_desc = [];
-                    if ($lang->code == current_locale()) {
-                        $tag_desc = [
-                            'name' => $tag,
-                            'slug' => str_slug($tag)
-                        ];
-                    }
+                    $tag_desc = [
+                        'name' => $tag,
+                        'slug' => str_slug($tag)
+                    ];
                     $newtag->langs()->attach($lang->id, $tag_desc);
                 }
                 $item->tags()->attach($newtag->id);
@@ -158,7 +199,7 @@ class PostEloquent extends BaseEloquent {
         }
 
         $lang_id = get_lang_id($data['lang']);
-        
+
         $lang_data = $data['locale'];
         $name = $lang_data['title'];
         $slug = $lang_data['slug'];
@@ -175,8 +216,8 @@ class PostEloquent extends BaseEloquent {
             foreach ($ids as $id) {
                 $item = $this->model->find($id);
                 if ($item) {
-                    $item->tags()->detach();
-                    $item->cats()->detach();
+                    $item->tags()->decrement('count')->detach();
+                    $item->cats()->decrement('count')->detach();
                     $item->langs()->detach();
                     $item->delete();
                 }

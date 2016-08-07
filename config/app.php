@@ -238,7 +238,8 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'Access' => App\Facades\Access\AccessFacade::class,
         'Lang' => App\Facades\Lang\LangFacade::class,
-        'Image' => Intervention\Image\Facades\Image::class
+        'Image' => Intervention\Image\Facades\Image::class,
+        'Option' => App\Facades\Option\OptionFacade::class,
 
     ],
 
